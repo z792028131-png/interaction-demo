@@ -1,1 +1,631 @@
-{"specVersion":"1.0.0","project":{"name":"春节福利卡片入场动效","previewUrl":"https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/","implementationFormat":"CSS and DOM motion specification","isStandaloneAnimationFile":false,"description":"记录当前 HTML 演示实际使用的动画参数；JSON 用于开发交接，不是可直接播放的 Lottie 文件。"},"designCanvas":{"widthPx":1920,"heightPx":1080,"coordinateUnit":"px","magicContainer":{"topInsetPx":60,"centerXpx":960,"centerYpx":570}},"fixedParameters":{"nominalDurationMs":1200,"baseTimelineDurationMs":2000,"timeScale":0.6,"effectBrightnessMultiplier":1.5,"particleDensity":{"count":10,"maximum":10},"note":"粒子最后一颗的最大延迟为 450ms，飞散时长为 810ms，因此最后粒子约在 1260ms 完成。"},"layerStackBackToFront":[{"id":"background","scope":"scene","zIndex":0},{"id":"scrim","scope":"scene","zIndex":4},{"id":"aura","scope":"magic-container","zIndex":1},{"id":"energy","scope":"magic-container","zIndex":1},{"id":"ring-one","scope":"magic-container","zIndex":1},{"id":"ring-two","scope":"magic-container","zIndex":1},{"id":"wave","scope":"magic-container","zIndex":1},{"id":"flash","scope":"magic-container","zIndex":3},{"id":"card","scope":"magic-container","zIndex":4},{"id":"particles","scope":"magic-container","zIndex":6}],"stackingContexts":{"magic-container":{"parent":"scene","zIndex":5,"alignment":"center"}},"animations":[{"id":"scrim-enter","layer":"scrim","baseDurationMs":500,"durationMs":300,"delayMs":0,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0},{"offset":1,"opacity":1}],"appearance":{"insetTopPx":60,"color":"rgba(10, 12, 24, 0.49)"}},{"id":"card-enter","layer":"card","baseDurationMs":1050,"durationMs":630,"delayBaseMs":250,"delayMs":150,"easing":"cubic-bezier(0.18, 0.84, 0.26, 1.1)","fillMode":"both","transformOrigin":"50% 50%","keyframes":[{"offset":0,"opacity":0,"scale":0},{"offset":1,"opacity":1,"scale":1}],"sizePx":{"width":500,"height":577},"note":"Bezier 曲线末端纵坐标为 1.1，带轻微回弹感；关键帧终值仍为 scale(1)。"},{"id":"aura-burst","layer":"aura","baseDurationMs":2000,"durationMs":1200,"delayMs":0,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"scale":0.08},{"offset":0.3,"opacity":1,"scale":0.8},{"offset":0.58,"opacity":0.85,"scale":1.14},{"offset":1,"opacity":0.11,"scale":1.45}],"appearance":{"sizePx":{"width":650,"height":650},"blurPx":25,"radialGradientCss":"radial-gradient(ellipse, rgba(255,235,230,.75) 0%, rgba(255,108,100,.5) 24%, rgba(241,56,77,.31) 43%, rgba(228,37,45,.06) 67%, transparent 78%)"}},{"id":"energy-spin","layer":"energy","baseDurationMs":1750,"durationMs":1050,"delayMs":0,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"rotationDeg":0,"scale":0.1},{"offset":0.34,"opacity":1},{"offset":0.78,"opacity":0.8},{"offset":1,"opacity":0,"rotationDeg":240,"scale":1.65}],"appearance":{"sizePx":{"width":465,"height":465},"rotationStartDeg":30,"blurPx":7,"mask":"radial-gradient(circle, transparent 41%, #000 52%, transparent 72%)","conicGradientCss":"conic-gradient(from 30deg, transparent, rgba(255,155,145,.1), rgba(255,112,112,.96), transparent 31%, transparent 44%, rgba(255,94,85,.8), transparent 72%, rgba(255,59,82,.8), transparent)"}},{"id":"ring-one-expand","layer":"ring-one","baseDurationMs":1650,"durationMs":990,"delayBaseMs":60,"delayMs":36,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"rotationDeg":-110,"scale":0.08},{"offset":0.36,"opacity":1},{"offset":1,"opacity":0,"rotationDeg":130,"scale":1.6}],"appearance":{"sizePx":{"width":420,"height":310},"borderWidthPx":4,"borderColor":{"top":"#ffe0cf","left":"#ff9988"},"blurPx":3,"dropShadow":"0 0 13px #ff958a"}},{"id":"ring-two-expand","layer":"ring-two","baseDurationMs":1700,"durationMs":1020,"delayBaseMs":120,"delayMs":72,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"rotationDeg":35,"scale":0.08},{"offset":0.42,"opacity":0.9},{"offset":1,"opacity":0,"rotationDeg":-150,"scale":1.6}],"appearance":{"sizePx":{"width":455,"height":345},"borderWidthPx":4,"borderColor":{"right":"#ffaaa0","bottom":"#f65b66"},"blurPx":3,"dropShadow":"0 0 13px #ff958a"}},{"id":"wave-expand","layer":"wave","baseDurationMs":1500,"durationMs":900,"delayBaseMs":280,"delayMs":168,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"scale":0.1},{"offset":0.27,"opacity":1},{"offset":1,"opacity":0,"scale":1.8}],"appearance":{"sizePx":{"width":380,"height":380},"borderWidthPx":4,"borderColor":"#ffe3dc","boxShadow":"0 0 30px #ff706e, inset 0 0 24px #ff706e"}},{"id":"center-flash","layer":"flash","baseDurationMs":780,"durationMs":468,"delayBaseMs":300,"delayMs":180,"easing":"ease-out","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"scale":0.1},{"offset":0.3,"opacity":1,"scale":0.7},{"offset":1,"opacity":0,"scale":2.1}],"appearance":{"sizePx":{"width":190,"height":190},"blurPx":10,"radialGradientCss":"radial-gradient(circle, #fff 0%, #fff7f3 8%, rgba(255,150,145,.9) 24%, transparent 72%)"}},{"id":"particles-flyout","layer":"particles","baseDurationMs":1350,"durationMs":810,"delayBaseMs":360,"easing":"cubic-bezier(0.17, 0.7, 0.33, 1)","fillMode":"both","keyframes":[{"offset":0,"opacity":0,"scale":0.1,"rotationDeg":0,"translation":"center"},{"offset":0.22,"opacity":1},{"offset":0.68,"opacity":0.9},{"offset":1,"opacity":0,"scale":0.8,"rotationDeg":110,"translation":"center + particle offset"}],"appearance":{"fontSizePx":18,"colors":{"particle":"#fff4b2","glow":["0 0 12px #ffdd8c","0 0 22px #ff9a89"]}}}],"particles":[{"glyph":"✦","xPx":-215,"yPx":-153,"additionalDelayMs":36,"totalDelayMs":252},{"glyph":"✧","xPx":224,"yPx":-115,"additionalDelayMs":84,"totalDelayMs":300},{"glyph":"✧","xPx":-245,"yPx":22,"additionalDelayMs":120,"totalDelayMs":336},{"glyph":"✦","xPx":235,"yPx":116,"additionalDelayMs":72,"totalDelayMs":288},{"glyph":"✦","xPx":-95,"yPx":216,"additionalDelayMs":192,"totalDelayMs":408},{"glyph":"✧","xPx":120,"yPx":-220,"additionalDelayMs":60,"totalDelayMs":276},{"glyph":"✧","xPx":265,"yPx":2,"additionalDelayMs":162,"totalDelayMs":378},{"glyph":"✦","xPx":-180,"yPx":190,"additionalDelayMs":234,"totalDelayMs":450},{"glyph":"✧","xPx":82,"yPx":221,"additionalDelayMs":150,"totalDelayMs":366},{"glyph":"✦","xPx":-230,"yPx":-194,"additionalDelayMs":138,"totalDelayMs":354}],"stateTransitions":[{"from":"initial-unclaimed","action":"claim","to":"claimed-card-open","result":"Shrink card to 500x545 and reveal the code row."},{"from":"initial-unclaimed","action":"close or snooze","to":"closed-with-floating-card","result":"Collapse the popup, fade the scrim, and slide the floating card in from the right."},{"from":"claimed-card-open","action":"close","to":"claimed-card-closed","result":"Close the popup without showing the floating card."},{"from":"closed-with-floating-card","action":"floating-card claim button","to":"initial-unclaimed","result":"Reopen the popup; the user can then claim the gift."},{"from":"any-state","action":"replay","to":"initial-unclaimed","result":"Clear claimed, code-copy, closing, closed, and floating states, then replay the entry animation."}],"claimAndCloseMotion":{"claim":{"cardHeightFromPx":577,"cardHeightToPx":545,"durationMs":300,"easing":"cubic-bezier(0.2, 0.7, 0.2, 1)","resultRevealDurationMs":220,"resultRevealEasing":"ease"},"close":{"cardDurationMs":300,"cardEasing":"cubic-bezier(0.4, 0, 0.8, 0.3)","cardScaleFrom":1,"cardScaleTo":0.84,"scrimDurationMs":280,"scrimEasing":"ease-in"},"floatingCard":{"widthPx":360,"heightPx":65,"rightPx":40,"bottomPx":70,"slideDurationMs":420,"slideEasing":"cubic-bezier(0.16, 1, 0.3, 1)","opacityDurationMs":200,"background":"rgba(255, 255, 255, 0.2)","backdropFilter":"blur(16px) saturate(1.8)","border":"1px solid rgba(255, 255, 255, 0.4)"}},"productionNotes":["卡片入场动画应用在真实弹窗 DOM/组件容器上；卡片 PNG 仅用于当前视觉演示，不应替代生产弹窗。","光效层保持在弹窗后面；星光粒子保持在弹窗前面。不要让弹窗容器的 overflow 裁切外部光效。","保持当前相对画板中心的缩放原点、关键帧、延迟、easing 和固定参数。"]}
+{
+  "specVersion": "1.0.0",
+  "project": {
+    "name": "春节福利卡片入场动效",
+    "previewUrl": "https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/",
+    "implementationFormat": "CSS and DOM motion specification",
+    "isStandaloneAnimationFile": false,
+    "description": "记录当前 HTML 演示实际使用的动画参数；JSON 用于开发交接，不是可直接播放的 Lottie 文件。"
+  },
+  "designCanvas": {
+    "widthPx": 1920,
+    "heightPx": 1080,
+    "coordinateUnit": "px",
+    "magicContainer": {
+      "topInsetPx": 60,
+      "centerXpx": 960,
+      "centerYpx": 570
+    }
+  },
+  "fixedParameters": {
+    "nominalDurationMs": 1200,
+    "baseTimelineDurationMs": 2000,
+    "timeScale": 0.6,
+    "effectBrightnessMultiplier": 1.5,
+    "particleDensity": {
+      "count": 10,
+      "maximum": 10
+    },
+    "note": "粒子最后一颗的最大延迟为 450ms，飞散时长为 810ms，因此最后粒子约在 1260ms 完成。"
+  },
+  "layerStackBackToFront": [
+    {
+      "id": "background",
+      "scope": "scene",
+      "zIndex": 0
+    },
+    {
+      "id": "scrim",
+      "scope": "scene",
+      "zIndex": 4
+    },
+    {
+      "id": "aura",
+      "scope": "magic-container",
+      "zIndex": 1
+    },
+    {
+      "id": "energy",
+      "scope": "magic-container",
+      "zIndex": 1
+    },
+    {
+      "id": "ring-one",
+      "scope": "magic-container",
+      "zIndex": 1
+    },
+    {
+      "id": "ring-two",
+      "scope": "magic-container",
+      "zIndex": 1
+    },
+    {
+      "id": "wave",
+      "scope": "magic-container",
+      "zIndex": 1
+    },
+    {
+      "id": "flash",
+      "scope": "magic-container",
+      "zIndex": 3
+    },
+    {
+      "id": "card",
+      "scope": "magic-container",
+      "zIndex": 4
+    },
+    {
+      "id": "particles",
+      "scope": "magic-container",
+      "zIndex": 6
+    }
+  ],
+  "stackingContexts": {
+    "magic-container": {
+      "parent": "scene",
+      "zIndex": 5,
+      "alignment": "center"
+    }
+  },
+  "animations": [
+    {
+      "id": "scrim-enter",
+      "layer": "scrim",
+      "baseDurationMs": 500,
+      "durationMs": 300,
+      "delayMs": 0,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0
+        },
+        {
+          "offset": 1,
+          "opacity": 1
+        }
+      ],
+      "appearance": {
+        "insetTopPx": 60,
+        "color": "rgba(10, 12, 24, 0.49)"
+      }
+    },
+    {
+      "id": "card-enter",
+      "layer": "card",
+      "baseDurationMs": 1050,
+      "durationMs": 630,
+      "delayBaseMs": 250,
+      "delayMs": 150,
+      "easing": "cubic-bezier(0.18, 0.84, 0.26, 1.1)",
+      "fillMode": "both",
+      "transformOrigin": "50% 50%",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "scale": 0
+        },
+        {
+          "offset": 1,
+          "opacity": 1,
+          "scale": 1
+        }
+      ],
+      "sizePx": {
+        "width": 500,
+        "height": 577
+      },
+      "note": "Bezier 曲线末端纵坐标为 1.1，带轻微回弹感；关键帧终值仍为 scale(1)。"
+    },
+    {
+      "id": "aura-burst",
+      "layer": "aura",
+      "baseDurationMs": 2000,
+      "durationMs": 1200,
+      "delayMs": 0,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "scale": 0.08
+        },
+        {
+          "offset": 0.3,
+          "opacity": 1,
+          "scale": 0.8
+        },
+        {
+          "offset": 0.58,
+          "opacity": 0.85,
+          "scale": 1.14
+        },
+        {
+          "offset": 1,
+          "opacity": 0.11,
+          "scale": 1.45
+        }
+      ],
+      "appearance": {
+        "sizePx": {
+          "width": 650,
+          "height": 650
+        },
+        "blurPx": 25,
+        "radialGradientCss": "radial-gradient(ellipse, rgba(255,235,230,.75) 0%, rgba(255,108,100,.5) 24%, rgba(241,56,77,.31) 43%, rgba(228,37,45,.06) 67%, transparent 78%)"
+      }
+    },
+    {
+      "id": "energy-spin",
+      "layer": "energy",
+      "baseDurationMs": 1750,
+      "durationMs": 1050,
+      "delayMs": 0,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "rotationDeg": 0,
+          "scale": 0.1
+        },
+        {
+          "offset": 0.34,
+          "opacity": 1
+        },
+        {
+          "offset": 0.78,
+          "opacity": 0.8
+        },
+        {
+          "offset": 1,
+          "opacity": 0,
+          "rotationDeg": 240,
+          "scale": 1.65
+        }
+      ],
+      "appearance": {
+        "sizePx": {
+          "width": 465,
+          "height": 465
+        },
+        "rotationStartDeg": 30,
+        "blurPx": 7,
+        "mask": "radial-gradient(circle, transparent 41%, #000 52%, transparent 72%)",
+        "conicGradientCss": "conic-gradient(from 30deg, transparent, rgba(255,155,145,.1), rgba(255,112,112,.96), transparent 31%, transparent 44%, rgba(255,94,85,.8), transparent 72%, rgba(255,59,82,.8), transparent)"
+      }
+    },
+    {
+      "id": "ring-one-expand",
+      "layer": "ring-one",
+      "baseDurationMs": 1650,
+      "durationMs": 990,
+      "delayBaseMs": 60,
+      "delayMs": 36,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "rotationDeg": -110,
+          "scale": 0.08
+        },
+        {
+          "offset": 0.36,
+          "opacity": 1
+        },
+        {
+          "offset": 1,
+          "opacity": 0,
+          "rotationDeg": 130,
+          "scale": 1.6
+        }
+      ],
+      "appearance": {
+        "sizePx": {
+          "width": 420,
+          "height": 310
+        },
+        "borderWidthPx": 4,
+        "borderColor": {
+          "top": "#ffe0cf",
+          "left": "#ff9988"
+        },
+        "blurPx": 3,
+        "dropShadow": "0 0 13px #ff958a"
+      }
+    },
+    {
+      "id": "ring-two-expand",
+      "layer": "ring-two",
+      "baseDurationMs": 1700,
+      "durationMs": 1020,
+      "delayBaseMs": 120,
+      "delayMs": 72,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "rotationDeg": 35,
+          "scale": 0.08
+        },
+        {
+          "offset": 0.42,
+          "opacity": 0.9
+        },
+        {
+          "offset": 1,
+          "opacity": 0,
+          "rotationDeg": -150,
+          "scale": 1.6
+        }
+      ],
+      "appearance": {
+        "sizePx": {
+          "width": 455,
+          "height": 345
+        },
+        "borderWidthPx": 4,
+        "borderColor": {
+          "right": "#ffaaa0",
+          "bottom": "#f65b66"
+        },
+        "blurPx": 3,
+        "dropShadow": "0 0 13px #ff958a"
+      }
+    },
+    {
+      "id": "wave-expand",
+      "layer": "wave",
+      "baseDurationMs": 1500,
+      "durationMs": 900,
+      "delayBaseMs": 280,
+      "delayMs": 168,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "scale": 0.1
+        },
+        {
+          "offset": 0.27,
+          "opacity": 1
+        },
+        {
+          "offset": 1,
+          "opacity": 0,
+          "scale": 1.8
+        }
+      ],
+      "appearance": {
+        "sizePx": {
+          "width": 380,
+          "height": 380
+        },
+        "borderWidthPx": 4,
+        "borderColor": "#ffe3dc",
+        "boxShadow": "0 0 30px #ff706e, inset 0 0 24px #ff706e"
+      }
+    },
+    {
+      "id": "center-flash",
+      "layer": "flash",
+      "baseDurationMs": 780,
+      "durationMs": 468,
+      "delayBaseMs": 300,
+      "delayMs": 180,
+      "easing": "ease-out",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "scale": 0.1
+        },
+        {
+          "offset": 0.3,
+          "opacity": 1,
+          "scale": 0.7
+        },
+        {
+          "offset": 1,
+          "opacity": 0,
+          "scale": 2.1
+        }
+      ],
+      "appearance": {
+        "sizePx": {
+          "width": 190,
+          "height": 190
+        },
+        "blurPx": 10,
+        "radialGradientCss": "radial-gradient(circle, #fff 0%, #fff7f3 8%, rgba(255,150,145,.9) 24%, transparent 72%)"
+      }
+    },
+    {
+      "id": "particles-flyout",
+      "layer": "particles",
+      "baseDurationMs": 1350,
+      "durationMs": 810,
+      "delayBaseMs": 360,
+      "easing": "cubic-bezier(0.17, 0.7, 0.33, 1)",
+      "fillMode": "both",
+      "keyframes": [
+        {
+          "offset": 0,
+          "opacity": 0,
+          "scale": 0.1,
+          "rotationDeg": 0,
+          "translation": "center"
+        },
+        {
+          "offset": 0.22,
+          "opacity": 1
+        },
+        {
+          "offset": 0.68,
+          "opacity": 0.9
+        },
+        {
+          "offset": 1,
+          "opacity": 0,
+          "scale": 0.8,
+          "rotationDeg": 110,
+          "translation": "center + particle offset"
+        }
+      ],
+      "appearance": {
+        "fontSizePx": 18,
+        "colors": {
+          "particle": "#fff4b2",
+          "glow": [
+            "0 0 12px #ffdd8c",
+            "0 0 22px #ff9a89"
+          ]
+        }
+      }
+    }
+  ],
+  "particles": [
+    {
+      "glyph": "✦",
+      "xPx": -215,
+      "yPx": -153,
+      "additionalDelayMs": 36,
+      "totalDelayMs": 252
+    },
+    {
+      "glyph": "✧",
+      "xPx": 224,
+      "yPx": -115,
+      "additionalDelayMs": 84,
+      "totalDelayMs": 300
+    },
+    {
+      "glyph": "✧",
+      "xPx": -245,
+      "yPx": 22,
+      "additionalDelayMs": 120,
+      "totalDelayMs": 336
+    },
+    {
+      "glyph": "✦",
+      "xPx": 235,
+      "yPx": 116,
+      "additionalDelayMs": 72,
+      "totalDelayMs": 288
+    },
+    {
+      "glyph": "✦",
+      "xPx": -95,
+      "yPx": 216,
+      "additionalDelayMs": 192,
+      "totalDelayMs": 408
+    },
+    {
+      "glyph": "✧",
+      "xPx": 120,
+      "yPx": -220,
+      "additionalDelayMs": 60,
+      "totalDelayMs": 276
+    },
+    {
+      "glyph": "✧",
+      "xPx": 265,
+      "yPx": 2,
+      "additionalDelayMs": 162,
+      "totalDelayMs": 378
+    },
+    {
+      "glyph": "✦",
+      "xPx": -180,
+      "yPx": 190,
+      "additionalDelayMs": 234,
+      "totalDelayMs": 450
+    },
+    {
+      "glyph": "✧",
+      "xPx": 82,
+      "yPx": 221,
+      "additionalDelayMs": 150,
+      "totalDelayMs": 366
+    },
+    {
+      "glyph": "✦",
+      "xPx": -230,
+      "yPx": -194,
+      "additionalDelayMs": 138,
+      "totalDelayMs": 354
+    }
+  ],
+  "stateTransitions": [
+    {
+      "from": "initial-unclaimed",
+      "action": "claim",
+      "to": "claimed-card-open",
+      "result": "Shrink card to 500x545 and reveal the code row."
+    },
+    {
+      "from": "initial-unclaimed",
+      "action": "close or snooze",
+      "to": "closed-with-floating-card",
+      "result": "Collapse the popup, fade the scrim, and slide the floating card in from the right."
+    },
+    {
+      "from": "claimed-card-open",
+      "action": "copy code",
+      "to": "claimed-card-open-copied",
+      "result": "Copy the gift code and keep the action label as 已复制 until the page reloads or the card reappears."
+    },
+    {
+      "from": "claimed-card-open-copied",
+      "action": "close",
+      "to": "claimed-card-closed",
+      "result": "Close the popup without showing the floating card."
+    },
+    {
+      "from": "claimed-card-open-copied",
+      "action": "card reappears (replay or reopen)",
+      "to": "claimed-card-open",
+      "result": "Reset the copy label to 复制 when the card appears again."
+    },
+    {
+      "from": "claimed-card-open-copied",
+      "action": "page reload",
+      "to": "initial-unclaimed",
+      "result": "Reset the copy label; the page returns to its initial unclaimed state."
+    },
+    {
+      "from": "claimed-card-open",
+      "action": "close",
+      "to": "claimed-card-closed",
+      "result": "Close the popup without showing the floating card."
+    },
+    {
+      "from": "closed-with-floating-card",
+      "action": "floating-card claim button",
+      "to": "initial-unclaimed",
+      "result": "Reopen the popup; the user can then claim the gift."
+    },
+    {
+      "from": "any-state",
+      "action": "replay",
+      "to": "initial-unclaimed",
+      "result": "Clear claimed, code-copy, closing, closed, and floating states, then replay the entry animation."
+    }
+  ],
+  "claimAndCloseMotion": {
+    "claim": {
+      "cardHeightFromPx": 577,
+      "cardHeightToPx": 545,
+      "durationMs": 300,
+      "easing": "cubic-bezier(0.2, 0.7, 0.2, 1)",
+      "resultRevealDurationMs": 220,
+      "resultRevealEasing": "ease"
+    },
+    "close": {
+      "cardDurationMs": 300,
+      "cardEasing": "cubic-bezier(0.4, 0, 0.8, 0.3)",
+      "cardScaleFrom": 1,
+      "cardScaleTo": 0.84,
+      "scrimDurationMs": 280,
+      "scrimEasing": "ease-in"
+    },
+    "floatingCard": {
+      "widthPx": 360,
+      "heightPx": 65,
+      "rightPx": 40,
+      "bottomPx": 70,
+      "slideDurationMs": 420,
+      "slideEasing": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "opacityDurationMs": 200,
+      "background": "rgba(255, 255, 255, 0.2)",
+      "backdropFilter": "blur(16px) saturate(1.8)",
+      "border": "1px solid rgba(255, 255, 255, 0.4)"
+    }
+  },
+  "productionNotes": [
+    "卡片入场动画应用在真实弹窗 DOM/组件容器上；卡片 PNG 仅用于当前视觉演示，不应替代生产弹窗。",
+    "光效层保持在弹窗后面；星光粒子保持在弹窗前面。不要让弹窗容器的 overflow 裁切外部光效。",
+    "保持当前相对画板中心的缩放原点、关键帧、延迟、easing 和固定参数。"
+  ],
+  "designReference": {
+    "figmaFileKey": "6fUsOH0qFBSIsbP0Mv2d6G",
+    "claimedScreenNodeId": "2403:23632",
+    "claimCodeRowNodeId": "2403:24566"
+  },
+  "claimResult": {
+    "cardWidthPx": 500,
+    "cardHeightPx": 545,
+    "claimCodeRow": {
+      "topPx": 441,
+      "widthPx": 460,
+      "heightPx": 44,
+      "paddingPx": {
+        "top": 12,
+        "right": 16,
+        "bottom": 12,
+        "left": 16
+      },
+      "gapPx": 20,
+      "borderRadiusPx": 10,
+      "background": "#f3f3f3",
+      "codeColor": "#1a1a1a",
+      "actionColor": "#e60000",
+      "fontSizePx": 14,
+      "lineHeightPx": 20
+    },
+    "bindingGuide": {
+      "label": "绑定指南",
+      "href": "https://jtexpress.feishu.cn/wiki/RYlXwwqD9iqot8kridDcOcyBnde?from=from_copylink",
+      "target": "_blank",
+      "rel": [
+        "noopener",
+        "noreferrer"
+      ]
+    },
+    "copy": {
+      "labelIdle": "复制",
+      "labelCopied": "已复制",
+      "copiedLabelPersistsUntil": [
+        "page reload",
+        "claim card reappears"
+      ],
+      "resetOn": [
+        "replay",
+        "reopen from floating card",
+        "page reload"
+      ],
+      "color": "#e60000"
+    }
+  }
+}
