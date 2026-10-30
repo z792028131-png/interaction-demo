@@ -6,34 +6,6 @@
 - [春节福利卡片 · 入场动效及领取交互](https://z792028131-png.github.io/interaction-demo/spring-festival-card-entry/)
 - [打开交互原型库首页](https://z792028131-png.github.io/interaction-demo/)
 
-## 本机实用工具
-
-以下两项是有实际用途的 macOS 本机应用，不是在线演示。项目源码和数据不放在这个公开目录中；只在保存了对应项目的 Mac 上启动，`127.0.0.1` 地址也只能由那台电脑访问。
-
-### 每日工作记录APP
-
-记录、回看和整理每日工作，支持日历查询、周报/月报汇总及 Word 历史记录导入。需要 Node.js 22.13 或更高版本。在该工具的项目目录运行：
-
-```bash
-pnpm install
-pnpm dev
-```
-
-然后打开 <http://127.0.0.1:5173>。
-
-### 组件库搭建APP
-
-整理 Figma PC 端组件状态和任务信息，生成可复制给 ChatGPT 的组件库指令。在该工具的项目目录运行：
-
-```bash
-pnpm install
-pnpm dev
-```
-
-然后打开 <http://127.0.0.1:8786>。macOS 上也可以双击「PC组件库指令生成器.app」启动。
-
-
-
 下面是春节福利卡片演示的固定参数和交付说明。
 
 `index.html` 是面向产品和开发的固定参数交互演示。页面打开自动播放一次，保留「重新播放动效」和「全屏预览」按钮，不显示参数调节杆。
@@ -81,4 +53,4 @@ pnpm dev
 - `assets/reference.gif`：紫粉色原始光效参考，仅用于比较轨迹和节奏。
 - 当前演示用弹窗 PNG 保真显示，按钮热区和领取后卡密行由 DOM 实现。正式业务实现应使用真实弹窗 DOM/组件；光效放在弹窗后层，粒子放在前层，避免被弹窗内部裁切。
 
-本地预览：在项目目录运行 `python3 -m http.server 8000`，打开 `http://localhost:8000`。
+本地预览：在项目目录运行 `python3 -m http.server 8000`，打开 `http://localhost:8000`.
