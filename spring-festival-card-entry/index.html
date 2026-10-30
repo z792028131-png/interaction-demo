@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="春节福利弹窗红色能量入场与领取后交互预览，支持重新播放和全屏演示。">
+<title>春节福利卡片 · 红色能量入场</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#23232b;color:#fff;font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+.stage{width:min(100%,1440px);margin:auto}
+#viewport{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;border-radius:12px;background:#f5f5f5}
+#scene{width:1920px;height:1080px;position:absolute;top:0;left:0;transform-origin:top left;isolation:isolate}
+#background{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+.bg-fallback{position:absolute;inset:0;z-index:-1;background:#f5f6f8;color:#222}
+.bg-fallback .nav{height:60px;background:#e60000;color:white;padding:15px 40px;font-size:25px;font-weight:700}
+.bg-fallback .columns{display:grid;grid-template-columns:1248px 560px;gap:24px;margin:20px 40px}
+.bg-fallback .module{background:white;border-radius:12px;padding:26px;margin-bottom:20px;box-shadow:0 1px 5px #0000000b}
+.bg-fallback .welcome{height:258px;background:linear-gradient(110deg,#fff2f0,#f9d1c6);font-size:38px;font-weight:650}
+.bg-fallback .fake-icons{height:260px;display:grid;grid-template-columns:repeat(8,1fr);gap:20px;align-items:center;text-align:center;color:#666}
+.bg-fallback .fake-icons span:before{content:'✦';display:block;font-size:36px;color:#e55c5c;margin-bottom:9px}
+.bg-fallback .fake-row{height:180px}.bg-fallback .side{height:190px}
+.jt-scrim{position:absolute;inset:60px 0 0;background:rgba(10,12,24,.49);z-index:4}
+.jt-magic{position:absolute;inset:60px 0 0;z-index:5;display:flex;align-items:center;justify-content:center;isolation:isolate;pointer-events:none}
+.jt-popup{position:relative;width:500px;height:577px;z-index:4;border-radius:20px;overflow:hidden;box-shadow:0 17px 42px #0005;transform-origin:center;pointer-events:auto;background:white;color:#222;transition:height .3s cubic-bezier(.2,.7,.2,1)}
+.jt-popup>img{display:block;width:100%;height:100%;object-fit:fill}
+.jt-card-placeholder{height:100%;display:flex;flex-direction:column}
+.jt-card-placeholder .art{height:281px;position:relative;background:linear-gradient(170deg,#b7daff,#e5f0ff 48%,#ffdcb3);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#dc1c14;overflow:hidden}
+.jt-card-placeholder .art:before{content:'✦　✧　✦';position:absolute;font-size:70px;top:0;color:#ffffffa8}
+.jt-card-placeholder .art strong{font-size:54px;text-shadow:2px 3px 0 #fff7}
+.jt-card-placeholder .art small{font-size:19px;margin-top:10px;letter-spacing:9px}
+.jt-card-placeholder .content{padding:20px;font-size:15px}
+.jt-card-placeholder .content h3{font-size:15px;margin:0 0 7px;font-weight:600}
+.jt-card-placeholder .content p{margin:0 0 20px;font-size:13px;color:#555}
+.jt-card-placeholder .gift{padding:16px;background:#fff4f4;border-radius:10px;font-size:14px;margin-bottom:20px}
+.jt-card-placeholder .gift small{display:block;color:#777;margin-top:7px}
+.jt-card-placeholder .claim{background:#e60000;border-radius:8px;color:white;text-align:center;padding:11px;font-size:15px}
+.jt-card-placeholder .later{text-align:center;font-size:13px;color:#999;margin-top:17px}
+.jt-card-placeholder .foot{text-align:center;font-size:11px;color:#999;margin-top:17px}
+.jt-aura,.jt-energy,.jt-ring,.jt-wave,.jt-flash{position:absolute;pointer-events:none;z-index:1}
+.jt-aura{width:650px;height:650px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,235,230,.75) 0%,rgba(255,108,100,.5) 24%,rgba(241,56,77,.31) 43%,rgba(228,37,45,.06) 67%,transparent 78%);filter:brightness(var(--fx-brightness,1)) blur(25px)}
+.jt-energy{width:465px;height:465px;border-radius:50%;background:conic-gradient(from 30deg,transparent,rgba(255,155,145,.1),rgba(255,112,112,.96),transparent 31%,transparent 44%,rgba(255,94,85,.8),transparent 72%,rgba(255,59,82,.8),transparent);-webkit-mask:radial-gradient(circle,transparent 41%,#000 52%,transparent 72%);mask:radial-gradient(circle,transparent 41%,#000 52%,transparent 72%);filter:brightness(var(--fx-brightness,1)) blur(7px);opacity:0}
+.jt-ring{width:420px;height:310px;border-radius:50%;border:4px solid transparent;filter:brightness(var(--fx-brightness,1)) blur(3px) drop-shadow(0 0 13px #ff958a);opacity:0}
+.jt-ring-one{border-top-color:#ffe0cf;border-left-color:#ff9988;transform:rotate(-33deg)}
+.jt-ring-two{width:455px;height:345px;border-right-color:#ffaaa0;border-bottom-color:#f65b66;transform:rotate(35deg)}
+.jt-wave{width:380px;height:380px;border-radius:50%;border:4px solid #ffe3dc;box-shadow:0 0 30px #ff706e,inset 0 0 24px #ff706e;filter:brightness(var(--fx-brightness,1));opacity:0}
+.jt-flash{width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fff7f3 8%,rgba(255,150,145,.9) 24%,transparent 72%);filter:brightness(var(--fx-brightness,1)) blur(10px);z-index:3;opacity:0}
+.jt-sparks{position:absolute;z-index:6;inset:0;pointer-events:none}
+.jt-sparks i{position:absolute;left:50%;top:50%;font-style:normal;font-size:18px;color:#fff4b2;opacity:0;text-shadow:0 0 12px #ffdd8c,0 0 22px #ff9a89;filter:brightness(var(--fx-brightness,1))}
+.playing .jt-scrim{animation:jt-dim .5s ease-out both}
+.playing .jt-popup{animation:jt-card-enter 1.05s cubic-bezier(.18,.84,.26,1.1) .25s both}
+.playing .jt-aura{animation:jt-aura-burst 2s ease-out both}
+.playing .jt-energy{animation:jt-spin 1.75s ease-out both}
+.playing .jt-ring-one{animation:jt-ring-a 1.65s ease-out .06s both}
+.playing .jt-ring-two{animation:jt-ring-b 1.7s ease-out .12s both}
+.playing .jt-wave{animation:jt-wave-pop 1.5s ease-out .28s both}
+.playing .jt-flash{animation:jt-flash-pop .78s ease-out .3s both}
+.playing .jt-sparks i{animation:jt-fly 1.35s cubic-bezier(.17,.7,.33,1) calc(.36s + var(--d)) both}
+.is-claimed .jt-popup{height:545px}
+.is-claimed .jt-popup>img{height:577px}
+.claim-result{position:absolute;z-index:2;left:0;top:421px;width:100%;height:124px;padding:20px;background:#fff;border-radius:0 0 20px 20px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .22s ease,transform .22s ease,visibility .22s;pointer-events:none}
+.is-claimed .claim-result{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+.claim-code{height:44px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-radius:10px;background:#f3f3f3;color:#1a1a1a;font-size:14px;line-height:20px;white-space:nowrap}
+.copy-code{flex:0 0 auto;border:0;padding:0;background:transparent;color:#165dff;font:inherit;cursor:pointer}
+.copy-code.is-copied{color:#00a870}
+.claim-foot{margin-top:20px;color:#999;text-align:center;font-size:12px;line-height:20px;white-space:nowrap}
+.popup-hitbox{position:absolute;z-index:4;border:0;padding:0;background:transparent;cursor:pointer}
+.close-hitbox{top:0;right:0;width:40px;height:44px}
+.claim-hitbox{top:441px;left:20px;width:460px;height:40px}
+.snooze-hitbox{top:488px;left:20px;width:460px;height:36px}
+.is-claimed .claim-hitbox,.is-claimed .snooze-hitbox{display:none}
+.is-closing .jt-popup{animation:jt-card-collapse .3s cubic-bezier(.4,0,.8,.3) both!important}
+.is-closing .jt-scrim{animation:jt-scrim-close .28s ease-in both!important}
+.is-closing .jt-aura,.is-closing .jt-energy,.is-closing .jt-ring,.is-closing .jt-wave,.is-closing .jt-flash,.is-closing .jt-sparks{animation:none!important;opacity:0!important}
+.is-closed .jt-scrim{opacity:0;visibility:hidden;pointer-events:none}
+.is-closed .jt-magic{display:none;visibility:hidden;pointer-events:none}
+#floating-card{position:absolute;z-index:8;right:40px;bottom:70px;width:360px;height:65px;display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid rgba(255,255,255,.4);border-radius:10px;background:rgba(255,255,255,.2);-webkit-backdrop-filter:blur(16px) saturate(1.8);backdrop-filter:blur(16px) saturate(1.8);box-shadow:0 2px 7.5px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.6);opacity:0;visibility:hidden;transform:translateX(calc(100% + 40px));pointer-events:none;transition:transform .42s cubic-bezier(.16,1,.3,1),opacity .2s ease,visibility 0s linear .42s}
+.is-floating #floating-card{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto;transition:transform .42s cubic-bezier(.16,1,.3,1),opacity .2s ease,visibility 0s}
+.float-gift-icon{position:relative;flex:0 0 36px;width:36px;height:36px;overflow:hidden;border-radius:6px;background-image:url('assets/popup.png');background-repeat:no-repeat;background-size:500px 577px;background-position:-36px -370px}
+.float-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;height:41px;overflow:hidden}
+.float-title{color:#1a1a1a;font-size:14px;font-weight:600;line-height:20px;white-space:nowrap}
+.float-subtitle{color:#e60000;font-size:13px;line-height:18px;white-space:nowrap}
+.float-claim{flex:0 0 74px;width:74px;height:32px;border:0;border-radius:8px;background:#e60000;color:#fff;font-family:inherit;font-size:13px;font-weight:500;line-height:20px;cursor:pointer}
+.is-closing #floating-card,.is-closed #floating-card{display:flex}
+@keyframes jt-card-collapse{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.84)}}
+@keyframes jt-scrim-close{from{opacity:1}to{opacity:0}}
+@keyframes jt-dim{from{opacity:0}to{opacity:1}}
+@keyframes jt-card-enter{0%{opacity:0;transform:scale(0)}100%{opacity:1;transform:scale(1)}}
+@keyframes jt-aura-burst{0%{opacity:0;transform:scale(.08)}30%{opacity:1;transform:scale(.8)}58%{opacity:.85;transform:scale(1.14)}100%{opacity:.11;transform:scale(1.45)}}
+@keyframes jt-spin{0%{opacity:0;transform:rotate(0) scale(.1)}34%{opacity:1}78%{opacity:.8}100%{opacity:0;transform:rotate(240deg) scale(1.65)}}
+@keyframes jt-ring-a{0%{opacity:0;transform:rotate(-110deg) scale(.08)}36%{opacity:1}100%{opacity:0;transform:rotate(130deg) scale(1.6)}}
+@keyframes jt-ring-b{0%{opacity:0;transform:rotate(35deg) scale(.08)}42%{opacity:.9}100%{opacity:0;transform:rotate(-150deg) scale(1.6)}}
+@keyframes jt-wave-pop{0%{opacity:0;transform:scale(.1)}27%{opacity:1}100%{opacity:0;transform:scale(1.8)}}
+@keyframes jt-flash-pop{0%{opacity:0;transform:scale(.1)}30%{opacity:1;transform:scale(.7)}100%{opacity:0;transform:scale(2.1)}}
+@keyframes jt-fly{0%{opacity:0;transform:translate(-50%,-50%) scale(.1) rotate(0)}22%{opacity:1}68%{opacity:.9}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(.8) rotate(110deg)}}
+.controls{display:flex;align-items:center;justify-content:center;margin:16px auto}
+.control-actions{display:flex;align-items:center;justify-content:center;gap:10px}
+.controls button{cursor:pointer;color:#fff;background:#dc4444;border:0;border-radius:8px;padding:12px 22px;font-size:14px;white-space:nowrap}
+@media(max-width:760px){body{padding:12px}}
+</style>
+</head>
+<body>
+<div class="stage">
+<div id="viewport"><div id="scene">
+  <div class="bg-fallback"><div class="nav">J&T　极兔工作台</div><div class="columns"><div><div class="module welcome">欢迎登录，郑雅</div><div class="module fake-icons"><span>我要请假</span><span>新建流程</span><span>考勤管理</span><span>加班申请</span><span>证明申请</span><span>我的绩效</span><span>我的考勤</span><span>我的信息</span></div><div class="module fake-row">文化加油站</div></div><div><div class="module side">郑雅　　我的团队</div><div class="module side">待办事项</div><div class="module side">我的假勤</div></div></div></div>
+  <img id="background" src="assets/background.png" alt="" onerror="this.style.display='none'">
+  <div class="jt-scrim"></div>
+  <div class="jt-magic">
+    <div class="jt-aura"></div><div class="jt-energy"></div>
+    <div class="jt-ring jt-ring-one"></div><div class="jt-ring jt-ring-two"></div>
+    <div class="jt-wave"></div><div class="jt-flash"></div>
+    <div class="jt-popup">
+      <div class="jt-card-placeholder"><div class="art"><strong>新春好礼</strong><small>礼遇相伴</small></div><div class="content"><h3>亲爱的极兔家人，春节快乐 🎊</h3><p>新年大吉，感谢一路同行。卯卯为您备好一份节日心意，记得查收~</p><div class="gift">京东E卡 (188元)<small>领取有效期：2026-01-10 至 2026-03-31</small></div><div class="claim">立即领取</div><div class="later">稍后再看</div><div class="foot">关闭后将收进工作台右下角浮窗 · 自动归档至「我的福利·节日福利」</div></div></div>
+      <img id="card-image" src="assets/popup.png" alt="" style="position:absolute;inset:0" onerror="this.style.display='none'">
+      <div class="claim-result" aria-live="polite">
+        <div class="claim-code"><span>卡密：1248-B004-2R3E-18OC</span><button id="copy-code" class="copy-code" type="button">复制</button></div>
+        <div class="claim-foot">关闭后将收进工作台右下角浮窗·自动归档至「我的福利·节日福利」</div>
+      </div>
+      <button class="popup-hitbox close-hitbox" id="close-popup" type="button" aria-label="关闭福利弹窗"></button>
+      <button class="popup-hitbox claim-hitbox" id="claim-gift" type="button" aria-label="立即领取"></button>
+      <button class="popup-hitbox snooze-hitbox" id="snooze-popup" type="button" aria-label="稍后再看"></button>
+    </div>
+    <div class="jt-sparks"><i style="--x:-215px;--y:-153px;--d:.06s">✦</i><i style="--x:224px;--y:-115px;--d:.14s">✧</i><i style="--x:-245px;--y:22px;--d:.2s">✧</i><i style="--x:235px;--y:116px;--d:.12s">✦</i><i style="--x:-95px;--y:216px;--d:.32s">✦</i><i style="--x:120px;--y:-220px;--d:.1s">✧</i><i style="--x:265px;--y:2px;--d:.27s">✧</i><i style="--x:-180px;--y:190px;--d:.39s">✦</i><i style="--x:82px;--y:221px;--d:.25s">✧</i><i style="--x:-230px;--y:-194px;--d:.23s">✦</i></div>
+  </div>
+  <div id="floating-card" role="status" aria-label="春节福利待领取">
+    <div class="float-gift-icon" aria-hidden="true"></div>
+    <div class="float-copy"><div class="float-title">春节福利待领取</div><div class="float-subtitle">京东E卡 (188元) · 剩余23天</div></div>
+    <button id="floating-claim" class="float-claim" type="button">立即领取</button>
+  </div>
+</div></div>
+<div class="controls">
+  <div class="control-actions"><button id="replay" type="button">重新播放动效</button><button id="fullscreen" type="button">全屏预览</button></div>
+</div>
+</div>
+<script>
+const scene=document.querySelector('#scene'),viewport=document.querySelector('#viewport');
+const sparks=[...document.querySelectorAll('.jt-sparks i')];
+const FIXED_DURATION_MS=1200,BASE_EFFECT_DURATION_MS=2000,FIXED_BRIGHTNESS=1.5;
+const durationScale=FIXED_DURATION_MS/BASE_EFFECT_DURATION_MS;
+const timedAnimations=[['.jt-scrim',500,0],['.jt-popup',1050,250],['.jt-aura',2000,0],['.jt-energy',1750,0],['.jt-ring-one',1650,60],['.jt-ring-two',1700,120],['.jt-wave',1500,280],['.jt-flash',780,300]];
+function resize(){scene.style.transform='scale('+(viewport.clientWidth/1920)+')'}
+function applyFixedParameters(){
+  scene.style.setProperty('--fx-brightness',String(FIXED_BRIGHTNESS));
+  timedAnimations.forEach(([selector,duration,delay])=>document.querySelectorAll(selector).forEach(element=>{element.style.animationDuration=(duration*durationScale)+'ms';element.style.animationDelay=(delay*durationScale)+'ms'}));
+  sparks.forEach(spark=>{const extraDelay=(parseFloat(spark.style.getPropertyValue('--d'))||0)*1000;spark.style.animationDuration=(1350*durationScale)+'ms';spark.style.animationDelay=((360+extraDelay)*durationScale)+'ms'});
+}
+function replay(){scene.classList.remove('playing');void scene.offsetWidth;scene.classList.add('playing')}
+function closeModal(){
+  if(scene.classList.contains('is-closing')||scene.classList.contains('is-closed'))return;
+  scene.classList.add('is-closing','is-floating');
+  window.setTimeout(()=>{scene.classList.remove('is-closing','playing');scene.classList.add('is-closed')},320);
+}
+function reopenModal(){
+  scene.classList.remove('is-floating','is-closed','is-closing','playing');
+  void scene.offsetWidth;
+  scene.classList.add('playing');
+}
+async function copyClaimCode(){
+  const code='1248-B004-2R3E-18OC',button=document.querySelector('#copy-code');
+  try{await navigator.clipboard.writeText(code)}catch(error){const field=document.createElement('textarea');field.value=code;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();document.execCommand('copy');field.remove()}
+  button.textContent='已复制';button.classList.add('is-copied');window.setTimeout(()=>{button.textContent='复制';button.classList.remove('is-copied')},1400);
+}
+applyFixedParameters();
+new ResizeObserver(resize).observe(viewport);resize();
+requestAnimationFrame(()=>scene.classList.add('playing'));
+document.querySelector('#claim-gift').addEventListener('click',()=>scene.classList.add('is-claimed'));
+document.querySelector('#close-popup').addEventListener('click',closeModal);
+document.querySelector('#snooze-popup').addEventListener('click',closeModal);
+document.querySelector('#floating-claim').addEventListener('click',reopenModal);
+document.querySelector('#copy-code').addEventListener('click',copyClaimCode);
+document.querySelector('#replay').addEventListener('click',replay);
+document.querySelector('#fullscreen').addEventListener('click',()=>{if(!document.fullscreenElement)viewport.requestFullscreen?.();else document.exitFullscreen?.()});
+</script>
+</body>
+</html>
