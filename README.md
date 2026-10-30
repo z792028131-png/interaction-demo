@@ -1,20 +1,60 @@
-# 春节福利卡片入场动效
+# 交互原型库
 
-这是用于产品评审的静态交互演示项目，包含固定参数的红色能量入场动效，以及领取、复制卡密、关闭收纳和右下角玻璃浮窗交互。
+## 项目入口
+
+- [OA新建页面 · 移动端高保真 Demo](https://z792028131-png.github.io/spring-festival-card-entry-demo/oa-new-page/)
+- [春节福利卡片 · 入场动效及领取交互](https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/)
+- [打开交互原型库首页](https://z792028131-png.github.io/spring-festival-card-entry-demo/)
+
+下面是春节福利卡片演示的固定参数和交付说明。
+
+`index.html` 是面向产品和开发的固定参数交互演示。页面打开自动播放一次，保留「重新播放动效」和「全屏预览」按钮，不显示参数调节杆。
 
 ## 在线预览
 
-- [打开春节福利卡片演示](https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/)
-- [打开原型库首页](https://z792028131-png.github.io/spring-festival-card-entry-demo/)
+https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/
 
-## 项目结构
+## 开发交接文件
 
-- `index.html`：原型库首页和当前项目入口。
-- `spring-festival-card-entry/`：春节福利卡片交互演示。
-- `spring-festival-card-entry/assets/`：Figma 导出的工作台背景和弹窗 PNG。
+- 动画参数 JSON：`prototype-library/spring-festival-card-entry/animation-spec.json`
+- [公开 JSON 文件](https://raw.githubusercontent.com/z792028131-png/spring-festival-card-entry-demo/main/spring-festival-card-entry/animation-spec.json)
+- 前端完整 HTML/CSS/JavaScript 演示：`index.html`
 
-项目没有构建步骤，通过 GitHub Pages 从 `main` 分支根目录发布。
+## 固定动画参数
 
-## 公开说明
+按验收截图锁定：时长 **1200 ms**、光效亮度 **150%**、粒子密度 **10 / 10**。时长按原 2000 ms 光效基准等比缩放为 0.6；光效图层 CSS brightness 为 1.5；十个星点全部显示并沿用原坐标。
 
-该仓库和 GitHub Pages 页面为公开内容。源码和素材可被任何人查看；请勿放入真实卡密、敏感信息或未经公司允许公开的资料。当前演示中的卡密仅为示例。
+## 交互流程
+
+1. 首次打开工作台时自动播放卡片入场动效。
+2. 点击卡片上的「立即领取」后，卡片从 500 × 577 收至 500 × 545，卡密行渐显：`1248-B004-2R3E-18OC`。领取后可点击「绑定指南」打开飞书说明，点击「复制」复制卡密；复制成功后「已复制」会以绿色 `#00a870` 保留，直到刷新页面或卡片再次出现。
+3. 未领取时点击关闭或「稍后再看」，卡片缩小淡出、遮罩淡出，右下角「春节福利待领取」浮窗从屏幕右侧滑入；领取并显示卡密后再关闭，不出现浮窗。
+4. 点击浮窗「立即领取」可再次打开弹窗；若已领取，会保留卡密状态。
+5. 点击「重新播放动效」会清除领取、卡密、关闭和浮窗状态，回到未领取的初始弹窗并重新播放入场动画。
+
+未领取弹窗关闭后遮罩完全退场，浮窗采用 iOS 风格玻璃质感：白色 20% 半透明底、16px 背景模糊、1.8 倍饱和度、半透明白色描边与顶部内高光。
+
+领取结果对应 Figma 画板「领取后」`2403:23632`，卡密行样式节点 `2403:24566`；浮窗对应「浮窗」`2487:28228`。Figma 没有提供这些状态间的原型连线，关闭/收起与滑入时长按需求描述实现：卡片收起 300 ms，遮罩 280 ms，浮窗从右侧滑入 420 ms。
+
+## 初次入场参数
+
+| 图层 | 固定时长 / 延迟 | 关键帧 / 曲线 |
+| --- | --- | --- |
+| 暗色遮罩 | 300 ms | `ease-out`，opacity 0 → 1 |
+| 卡片 | 630 ms / 150 ms | `scale(0) → scale(1)`；`cubic-bezier(.18,.84,.26,1.1)` 连续回弹 |
+| 柔光 | 1200 ms | `ease-out`；scale .08 → .8 → 1.14 → 1.45 |
+| 旋转能量 | 1050 ms | `ease-out`；旋转 240°，scale .1 → 1.65 |
+| 能量环一 | 990 ms / 36 ms | `ease-out`；旋转 -110° → 130°，scale .08 → 1.6 |
+| 能量环二 | 1020 ms / 72 ms | `ease-out`；旋转 35° → -150°，scale .08 → 1.6 |
+| 圆形光波 | 900 ms / 168 ms | `ease-out`；scale .1 → 1.8 |
+| 中心闪光 | 468 ms / 180 ms | `ease-out`；scale .1 → .7 → 2.1 |
+| 星星粒子 | 810 ms，基础延迟 216 ms + 各粒子延迟 | `cubic-bezier(.17,.7,.33,1)`；原 `--x` / `--y` 坐标 |
+
+## 素材与生产说明
+
+- `assets/background.png`：工作台背景，3840 × 2160，对应 1920 × 1080 设计基准。
+- `assets/popup.png`：透明弹窗对照图，1500 × 1731，对应 500 × 577 设计尺寸。
+- `assets/reference.gif`：紫粉色原始光效参考，仅用于比较轨迹和节奏。
+- 当前演示用弹窗 PNG 保真显示，按钮热区和领取后卡密行由 DOM 实现。正式业务实现应使用真实弹窗 DOM/组件；光效放在弹窗后层，粒子放在前层，避免被弹窗内部裁切。
+
+本地预览：在项目目录运行 `python3 -m http.server 8000`，打开 `http://localhost:8000`。

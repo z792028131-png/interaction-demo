@@ -24,6 +24,8 @@
     .preview-bg{width:100%;height:100%;object-fit:cover;object-position:top;filter:brightness(.74)}
     .preview-card{position:absolute;left:50%;top:50%;width:23%;height:auto;transform:translate(-50%,-46%);border-radius:7px;box-shadow:0 12px 32px #0005}
     .preview-glow{position:absolute;left:50%;top:50%;width:48%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ffded8a8,transparent 68%);transform:translate(-50%,-50%);pointer-events:none}
+    .oa-preview{background:linear-gradient(145deg,#f1edff,#f8f7fb)}
+    .oa-preview iframe{position:absolute;left:50%;top:10px;width:402px;height:999px;border:0;pointer-events:none;transform:translateX(-50%) scale(.43);transform-origin:top center}
     .card-body{padding:21px 22px 22px}
     .category{color:#e21b23;font-size:12px;font-weight:700;letter-spacing:.04em}
     .card h3{margin:8px 0 7px;font-size:18px;letter-spacing:-.02em}
@@ -52,6 +54,23 @@
     </div>
 
     <section class="grid" aria-label="原型列表">
+      <article class="card">
+        <a href="./oa-new-page/" aria-label="打开 OA新建页面移动端演示" style="display:block;position:relative;text-decoration:none">
+          <div class="preview oa-preview" aria-hidden="true">
+            <iframe src="./oa-new-page/" title="OA新建页面移动端预览" loading="lazy" tabindex="-1"></iframe>
+          </div>
+        </a>
+        <div class="card-body">
+          <div class="category">OA新建页面 · 移动端高保真 Demo</div>
+          <h3>OA移动端流程助手</h3>
+          <p class="card-copy">搜索与筛选流程、收藏常用事项，并通过输入框提交办理意图。</p>
+          <div class="tags"><span class="tag">移动端</span><span class="tag">流程搜索</span><span class="tag">收藏交互</span></div>
+          <div class="card-footer">
+            <span class="updated">402 px 设计宽度</span>
+            <a class="open" href="./oa-new-page/">打开演示 <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </article>
       <article class="card">
         <a href="./spring-festival-card-entry/" aria-label="打开春节福利卡片动效演示" style="display:block;position:relative;text-decoration:none">
           <div class="preview" aria-hidden="true">
