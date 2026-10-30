@@ -136,6 +136,7 @@ body{margin:0;padding:20px;background:#23232b;color:#fff;font-family:"PingFang S
 const scene=document.querySelector('#scene'),viewport=document.querySelector('#viewport');
 const sparks=[...document.querySelectorAll('.jt-sparks i')];
 const FIXED_DURATION_MS=1200,BASE_EFFECT_DURATION_MS=2000,FIXED_BRIGHTNESS=1.5;
+let closingTimer=0;
 const durationScale=FIXED_DURATION_MS/BASE_EFFECT_DURATION_MS;
 const timedAnimations=[['.jt-scrim',500,0],['.jt-popup',1050,250],['.jt-aura',2000,0],['.jt-energy',1750,0],['.jt-ring-one',1650,60],['.jt-ring-two',1700,120],['.jt-wave',1500,280],['.jt-flash',780,300]];
 function resize(){scene.style.transform='scale('+(viewport.clientWidth/1920)+')'}
@@ -144,15 +145,25 @@ function applyFixedParameters(){
   timedAnimations.forEach(([selector,duration,delay])=>document.querySelectorAll(selector).forEach(element=>{element.style.animationDuration=(duration*durationScale)+'ms';element.style.animationDelay=(delay*durationScale)+'ms'}));
   sparks.forEach(spark=>{const extraDelay=(parseFloat(spark.style.getPropertyValue('--d'))||0)*1000;spark.style.animationDuration=(1350*durationScale)+'ms';spark.style.animationDelay=((360+extraDelay)*durationScale)+'ms'});
 }
-function replay(){scene.classList.remove('playing');void scene.offsetWidth;scene.classList.add('playing')}
+function replay(){
+  window.clearTimeout(closingTimer);
+  scene.classList.remove('is-claimed','is-floating','is-closed','is-closing','playing');
+  const copyButton=document.querySelector('#copy-code');
+  copyButton.textContent='复制';
+  copyButton.classList.remove('is-copied');
+  void scene.offsetWidth;
+  scene.classList.add('playing');
+}
 function closeModal(){
   if(scene.classList.contains('is-closing')||scene.classList.contains('is-closed'))return;
   scene.classList.add('is-closing');
   if(scene.classList.contains('is-claimed'))scene.classList.remove('is-floating');
   else scene.classList.add('is-floating');
-  window.setTimeout(()=>{scene.classList.remove('is-closing','playing');scene.classList.add('is-closed')},320);
+  window.clearTimeout(closingTimer);
+  closingTimer=window.setTimeout(()=>{scene.classList.remove('is-closing','playing');scene.classList.add('is-closed')},320);
 }
 function reopenModal(){
+  window.clearTimeout(closingTimer);
   scene.classList.remove('is-floating','is-closed','is-closing','playing');
   void scene.offsetWidth;
   scene.classList.add('playing');
