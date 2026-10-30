@@ -4,7 +4,7 @@
 
 ## 在线预览
 
-[打开 OA新建页面演示](https://z792028131-png.github.io/spring-festival-card-entry-demo/oa-new-page/)
+[打开 OA新建页面演示](https://z792028131-png.github.io/interaction-demo/oa-new-page/)
 
 ## 页面交互
 
@@ -21,4 +21,4 @@
 - `source.zip`：可下载的源码包，不包含 `node_modules` 和本地启动脚本。
 - 发布版由 `source/` 执行 `pnpm build` 生成在当前目录根部。
 
-项目首页：[交互原型库](https://z792028131-png.github.io/spring-festival-card-entry-demo/)。
+项目首页：[交互原型库](https://z792028131-png.github.io/interaction-demo/)。
