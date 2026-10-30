@@ -10,10 +10,6 @@
 
 `index.html` 是面向产品和开发的固定参数交互演示。页面打开自动播放一次，保留「重新播放动效」和「全屏预览」按钮，不显示参数调节杆。
 
-## 在线预览
-
-https://z792028131-png.github.io/interaction-demo/spring-festival-card-entry/
-
 ## 开发交接文件
 
 - 动画参数 JSON：`prototype-library/spring-festival-card-entry/animation-spec.json`
