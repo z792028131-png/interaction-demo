@@ -2,9 +2,9 @@
 
 ## 项目入口
 
-- [OA新建页面 · 移动端高保真 Demo](https://z792028131-png.github.io/spring-festival-card-entry-demo/oa-new-page/)
-- [春节福利卡片 · 入场动效及领取交互](https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/)
-- [打开交互原型库首页](https://z792028131-png.github.io/spring-festival-card-entry-demo/)
+- [OA新建页面 · 移动端高保真 Demo](https://z792028131-png.github.io/interaction-demo/oa-new-page/)
+- [春节福利卡片 · 入场动效及领取交互](https://z792028131-png.github.io/interaction-demo/spring-festival-card-entry/)
+- [打开交互原型库首页](https://z792028131-png.github.io/interaction-demo/)
 
 下面是春节福利卡片演示的固定参数和交付说明。
 
@@ -12,12 +12,12 @@
 
 ## 在线预览
 
-https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/
+https://z792028131-png.github.io/interaction-demo/spring-festival-card-entry/
 
 ## 开发交接文件
 
 - 动画参数 JSON：`prototype-library/spring-festival-card-entry/animation-spec.json`
-- [公开 JSON 文件](https://raw.githubusercontent.com/z792028131-png/spring-festival-card-entry-demo/main/spring-festival-card-entry/animation-spec.json)
+- [公开 JSON 文件](https://raw.githubusercontent.com/z792028131-png/interaction-demo/main/spring-festival-card-entry/animation-spec.json)
 - 前端完整 HTML/CSS/JavaScript 演示：`index.html`
 
 ## 固定动画参数
