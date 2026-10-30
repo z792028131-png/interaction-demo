@@ -2,13 +2,18 @@
 
 这是用于产品评审的静态交互演示项目，包含固定参数的红色能量入场动效，以及领取、复制卡密、关闭收纳和右下角玻璃浮窗交互。
 
+## 在线预览
+
+- [打开春节福利卡片演示](https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/)
+- [打开原型库首页](https://z792028131-png.github.io/spring-festival-card-entry-demo/)
+
 ## 项目结构
 
 - `index.html`：原型库首页和当前项目入口。
 - `spring-festival-card-entry/`：春节福利卡片交互演示。
 - `spring-festival-card-entry/assets/`：Figma 导出的工作台背景和弹窗 PNG。
 
-项目没有构建步骤。发布仓库根目录后，在 **Settings → Pages** 中选择从 `main` 分支的根目录发布。
+项目没有构建步骤，通过 GitHub Pages 从 `main` 分支根目录发布。
 
 ## 公开说明
 
