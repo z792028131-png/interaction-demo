@@ -2,7 +2,7 @@
   "specVersion": "1.0.0",
   "project": {
     "name": "春节福利卡片入场动效",
-    "previewUrl": "https://z792028131-png.github.io/spring-festival-card-entry-demo/spring-festival-card-entry/",
+"previewUrl": "https://z792028131-png.github.io/interaction-demo/spring-festival-card-entry/",
     "implementationFormat": "CSS and DOM motion specification",
     "isStandaloneAnimationFile": false,
     "description": "记录当前 HTML 演示实际使用的动画参数；JSON 用于开发交接，不是可直接播放的 Lottie 文件。"
