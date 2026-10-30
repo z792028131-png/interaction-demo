@@ -625,7 +625,8 @@
         "reopen from floating card",
         "page reload"
       ],
-      "color": "#e60000"
+      "color": "#e60000",
+      "copiedColor": "#00a870"
     }
   }
 }

@@ -64,6 +64,7 @@ body{margin:0;padding:20px;background:#23232b;color:#fff;font-family:"PingFang S
 .claim-code>span{flex:1;min-width:0}
 .binding-guide,.copy-code{flex:0 0 auto;padding:0;border:0;background:transparent;color:#e60000;font:inherit;line-height:20px;white-space:nowrap;cursor:pointer}
 .binding-guide{text-decoration:none}
+.copy-code.is-copied{color:#00a870}
 .claim-foot{margin-top:20px;color:#999;text-align:center;font-size:12px;line-height:20px;white-space:nowrap}
 .popup-hitbox{position:absolute;z-index:4;border:0;padding:0;background:transparent;cursor:pointer}
 .close-hitbox{top:0;right:0;width:40px;height:44px}
@@ -146,7 +147,7 @@ function applyFixedParameters(){
   timedAnimations.forEach(([selector,duration,delay])=>document.querySelectorAll(selector).forEach(element=>{element.style.animationDuration=(duration*durationScale)+'ms';element.style.animationDelay=(delay*durationScale)+'ms'}));
   sparks.forEach(spark=>{const extraDelay=(parseFloat(spark.style.getPropertyValue('--d'))||0)*1000;spark.style.animationDuration=(1350*durationScale)+'ms';spark.style.animationDelay=((360+extraDelay)*durationScale)+'ms'});
 }
-function resetCopyLabel(){document.querySelector('#copy-code').textContent='复制'}
+function resetCopyLabel(){const button=document.querySelector('#copy-code');button.textContent='复制';button.classList.remove('is-copied')}
 function replay(){
   window.clearTimeout(closingTimer);
   scene.classList.remove('is-claimed','is-floating','is-closed','is-closing','playing');
@@ -172,7 +173,7 @@ function reopenModal(){
 async function copyClaimCode(){
   const code='1248-B004-2R3E-18OC',button=document.querySelector('#copy-code');
   try{await navigator.clipboard.writeText(code)}catch(error){const field=document.createElement('textarea');field.value=code;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();document.execCommand('copy');field.remove()}
-  button.textContent='已复制';
+  button.textContent='已复制';button.classList.add('is-copied');
 }
 applyFixedParameters();
 new ResizeObserver(resize).observe(viewport);resize();
