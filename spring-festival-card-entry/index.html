@@ -60,9 +60,10 @@ body{margin:0;padding:20px;background:#23232b;color:#fff;font-family:"PingFang S
 .is-claimed .jt-popup>img{height:577px}
 .claim-result{position:absolute;z-index:2;left:0;top:421px;width:100%;height:124px;padding:20px;background:#fff;border-radius:0 0 20px 20px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .22s ease,transform .22s ease,visibility .22s;pointer-events:none}
 .is-claimed .claim-result{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
-.claim-code{height:44px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-radius:10px;background:#f3f3f3;color:#1a1a1a;font-size:14px;line-height:20px;white-space:nowrap}
-.copy-code{flex:0 0 auto;border:0;padding:0;background:transparent;color:#165dff;font:inherit;cursor:pointer}
-.copy-code.is-copied{color:#00a870}
+.claim-code{height:44px;width:100%;display:flex;align-items:center;gap:20px;padding:12px 16px;border-radius:10px;background:#f3f3f3;color:#1a1a1a;font-size:14px;line-height:20px;white-space:nowrap}
+.claim-code>span{flex:1;min-width:0}
+.binding-guide,.copy-code{flex:0 0 auto;padding:0;border:0;background:transparent;color:#e60000;font:inherit;line-height:20px;white-space:nowrap;cursor:pointer}
+.binding-guide{text-decoration:none}
 .claim-foot{margin-top:20px;color:#999;text-align:center;font-size:12px;line-height:20px;white-space:nowrap}
 .popup-hitbox{position:absolute;z-index:4;border:0;padding:0;background:transparent;cursor:pointer}
 .close-hitbox{top:0;right:0;width:40px;height:44px}
@@ -113,7 +114,7 @@ body{margin:0;padding:20px;background:#23232b;color:#fff;font-family:"PingFang S
       <div class="jt-card-placeholder"><div class="art"><strong>新春好礼</strong><small>礼遇相伴</small></div><div class="content"><h3>亲爱的极兔家人，春节快乐 🎊</h3><p>新年大吉，感谢一路同行。卯卯为您备好一份节日心意，记得查收~</p><div class="gift">京东E卡 (188元)<small>领取有效期：2026-01-10 至 2026-03-31</small></div><div class="claim">立即领取</div><div class="later">稍后再看</div><div class="foot">关闭后将收进工作台右下角浮窗 · 自动归档至「我的福利·节日福利」</div></div></div>
       <img id="card-image" src="assets/popup.png" alt="" style="position:absolute;inset:0" onerror="this.style.display='none'">
       <div class="claim-result" aria-live="polite">
-        <div class="claim-code"><span>卡密：1248-B004-2R3E-18OC</span><button id="copy-code" class="copy-code" type="button">复制</button></div>
+        <div class="claim-code"><span>卡密：1248-B004-2R3E-18OC</span><a class="binding-guide" href="https://jtexpress.feishu.cn/wiki/RYlXwwqD9iqot8kridDcOcyBnde?from=from_copylink" target="_blank" rel="noopener noreferrer">绑定指南</a><button id="copy-code" class="copy-code" type="button">复制</button></div>
         <div class="claim-foot">关闭后将收进工作台右下角浮窗·自动归档至「我的福利·节日福利」</div>
       </div>
       <button class="popup-hitbox close-hitbox" id="close-popup" type="button" aria-label="关闭福利弹窗"></button>
@@ -145,12 +146,11 @@ function applyFixedParameters(){
   timedAnimations.forEach(([selector,duration,delay])=>document.querySelectorAll(selector).forEach(element=>{element.style.animationDuration=(duration*durationScale)+'ms';element.style.animationDelay=(delay*durationScale)+'ms'}));
   sparks.forEach(spark=>{const extraDelay=(parseFloat(spark.style.getPropertyValue('--d'))||0)*1000;spark.style.animationDuration=(1350*durationScale)+'ms';spark.style.animationDelay=((360+extraDelay)*durationScale)+'ms'});
 }
+function resetCopyLabel(){document.querySelector('#copy-code').textContent='复制'}
 function replay(){
   window.clearTimeout(closingTimer);
   scene.classList.remove('is-claimed','is-floating','is-closed','is-closing','playing');
-  const copyButton=document.querySelector('#copy-code');
-  copyButton.textContent='复制';
-  copyButton.classList.remove('is-copied');
+  resetCopyLabel();
   void scene.offsetWidth;
   scene.classList.add('playing');
 }
@@ -165,13 +165,14 @@ function closeModal(){
 function reopenModal(){
   window.clearTimeout(closingTimer);
   scene.classList.remove('is-floating','is-closed','is-closing','playing');
+  resetCopyLabel();
   void scene.offsetWidth;
   scene.classList.add('playing');
 }
 async function copyClaimCode(){
   const code='1248-B004-2R3E-18OC',button=document.querySelector('#copy-code');
   try{await navigator.clipboard.writeText(code)}catch(error){const field=document.createElement('textarea');field.value=code;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();document.execCommand('copy');field.remove()}
-  button.textContent='已复制';button.classList.add('is-copied');window.setTimeout(()=>{button.textContent='复制';button.classList.remove('is-copied')},1400);
+  button.textContent='已复制';
 }
 applyFixedParameters();
 new ResizeObserver(resize).observe(viewport);resize();
