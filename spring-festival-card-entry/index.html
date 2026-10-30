@@ -147,7 +147,9 @@ function applyFixedParameters(){
 function replay(){scene.classList.remove('playing');void scene.offsetWidth;scene.classList.add('playing')}
 function closeModal(){
   if(scene.classList.contains('is-closing')||scene.classList.contains('is-closed'))return;
-  scene.classList.add('is-closing','is-floating');
+  scene.classList.add('is-closing');
+  if(scene.classList.contains('is-claimed'))scene.classList.remove('is-floating');
+  else scene.classList.add('is-floating');
   window.setTimeout(()=>{scene.classList.remove('is-closing','playing');scene.classList.add('is-closed')},320);
 }
 function reopenModal(){
