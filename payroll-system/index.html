@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="薪酬系统交互原型">
+  <title>薪酬系统｜交互原型</title>
+  <style>
+    :root{
+      --brand:#e60000;--brand-soft:#fdebea;--text:#333;--muted:#999;--line:#e7e7e7;
+      --page:#f7f7f8;--panel:#fff;--head:#f5f6f7;--stripe:#f8f9fa;--tip:#fff7eb;
+      --green:#39a95b;--red:#e60000;--drawer-shadow:0 0 22px rgba(0,0,0,.12)
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-width:1280px;min-height:100%;font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;color:var(--text);font-size:14px;background:var(--page)}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .topbar{height:60px;background:var(--brand);color:#fff;display:flex;align-items:center;position:relative;z-index:5;white-space:nowrap}
+    .brand{width:195px;height:60px;display:flex;align-items:center;padding-left:24px;gap:6px;font-size:24px;font-weight:800;font-style:italic;letter-spacing:-1.5px;color:#fff}
+    .brand-mark{font-size:26px;letter-spacing:-2px;font-weight:900;transform:skew(-12deg)}
+    .brand-home{font-size:20px;font-style:normal;font-weight:400;letter-spacing:-.6px}
+    .topnav{height:60px;display:flex;align-items:center;gap:0}
+    .topnav-item{height:46px;min-width:70px;padding:0 16px;display:flex;align-items:center;justify-content:center;position:relative;font-size:16px;font-weight:600;color:#fff}
+    .topnav-item.active:after{content:"";position:absolute;bottom:0;width:8px;height:2px;border-radius:2px;background:#fff}
+    .topnav-right{margin-left:auto;margin-right:24px;display:flex;align-items:center;gap:10px}
+    .top-action{height:32px;padding:0 13px;border:0;border-radius:6px;background:rgba(255,255,255,.22);color:#fff;font-size:13px;display:flex;align-items:center;gap:6px}
+    .top-action:hover{background:rgba(255,255,255,.3)}
+    .top-action .mini{font-size:15px;line-height:1}
+    .layout{height:calc(100vh - 60px);min-height:760px;padding:20px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;overflow:hidden}
+    .sidebar,.workspace{background:var(--panel);border-radius:12px;min-height:0}
+    .sidebar{padding:16px 10px;overflow:auto}
+    .nav-row{width:100%;height:54px;border:0;background:transparent;border-radius:8px;display:flex;align-items:center;text-align:left;padding:0 12px;gap:10px;color:#444;font-size:15px;font-weight:600;margin-bottom:8px}
+    .nav-row:hover{background:#F6F7F8}
+    .nav-row.active{background:#fff;color:#333}
+    .nav-row.active:hover{background:#F6F7F8;color:#333}
+    .nav-ico{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;color:#999;font-size:18px;flex:0 0 22px}
+    .nav-ico img{display:block;width:22px;height:22px}
+    .nav-chevron{margin-left:auto;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px}
+    .nav-chevron img{display:block;width:16px;height:16px}
+    .subnav{display:grid;gap:6px;margin:0 0 10px 0}
+    .subnav button{height:52px;padding:0 12px 0 44px;border:0;background:transparent;text-align:left;border-radius:8px;color:#666;font-size:15px}
+    .subnav button:hover{background:#f8f8f8;color:#333}
+    .subnav button.active{background:var(--brand-soft);color:var(--brand);font-weight:600}
+    .workspace{padding:20px;overflow:auto;position:relative}
+    .page-content{min-width:0;min-height:100%;display:flex;flex-direction:column}
+    .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:32px;margin-bottom:20px}
+    .searchbox{width:250px;height:32px;border:1px solid #dedede;border-radius:6px;display:flex;align-items:center;background:#fff;overflow:hidden}
+    .searchbox input{width:100%;height:100%;border:0;outline:0;padding:0 12px;font-size:13px}
+    .search-ico{width:34px;height:100%;flex:0 0 34px;display:flex;align-items:center;justify-content:center}
+    .search-ico img{display:block;width:14px;height:14px}
+    .filter-wrap{position:relative;display:inline-flex}
+    .filter-chip{height:32px;max-width:300px;border:0;border-radius:6px;background:#f5f6f7;color:#333;padding:0 8px 0 10px;display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;text-align:left}
+    .filter-chip:hover,.filter-chip.open{background:#fdebe8;color:#e60000}
+    .filter-chip.has-selection{width:auto;background:#fdebe8;color:#333}
+    .filter-chip.has-selection:hover,.filter-chip.has-selection.open{color:#e60000}
+    .filter-chip .filter-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .filter-chip.has-selection .filter-label{flex:0 1 auto}
+    .filter-chip .caret{width:12px;height:12px;flex:0 0 12px;display:inline-flex;align-items:center;justify-content:center;line-height:1;transition:transform .15s}
+    .filter-chip .caret img{display:block;width:12px;height:12px}
+    .filter-chip .state-active{display:none!important}
+    .filter-chip:hover .state-default,.filter-chip.open .state-default,.filter-chip:active .state-default{display:none!important}
+    .filter-chip:hover .state-active,.filter-chip.open .state-active,.filter-chip:active .state-active{display:block!important}
+    .filter-chip.open .caret{transform:rotate(180deg)}
+    .filter-sep{height:18px;width:1px;background:#e5e5e5;flex:0 0 1px}
+    .filter-clear{display:inline-flex;align-items:center;justify-content:center;flex:0 0 14px;width:14px;height:14px;line-height:0;cursor:pointer}
+    .filter-clear img{display:block;width:14px;height:14px}
+    .filter-chip.has-selection .selected-clear{display:none;width:14px;height:14px}
+    .filter-chip.has-selection:hover .selected-clear{display:inline-flex}
+    .filter-chip.has-selection:hover .caret,.filter-chip.has-selection.open .selected-clear{display:none}
+    .filter-chip.has-selection.open .caret{display:inline-flex}
+    .filter-menu{position:absolute;top:37px;left:0;z-index:15;min-width:180px;max-height:310px;overflow:auto;padding:6px;background:#fff;border:1px solid #ececec;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+    .filter-menu .filter-option{display:flex;align-items:center;gap:8px;width:100%;height:32px;border:0;background:#fff;text-align:left;padding:0 9px;border-radius:5px;font-size:13px;white-space:nowrap;color:#333}
+    .filter-menu .filter-option:hover{background:#f5f5f5}
+    .filter-check{width:14px;height:14px;border:1px solid #c8c8c8;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;line-height:1;flex:0 0 14px}
+    .filter-option.checked .filter-check{border-color:#e60000;background:#e60000}
+    .btn{height:32px;padding:0 14px;border:1px solid #dedede;background:#fff;border-radius:6px;color:#444;font-size:13px;white-space:nowrap}
+    .btn:hover{border-color:#bbb;background:#fafafa}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn.primary:hover{background:#d60000}
+    .btn.ghost-red{border-color:#f0b8b8;color:var(--brand);background:#fff}
+    .btn.small{height:28px;padding:0 10px}
+    .btn[disabled]{color:#c8c8c8;background:#f7f7f7;border-color:#e5e5e5;cursor:not-allowed}
+    .toolbar-spacer{flex:1}
+    .toolbar-query-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto;white-space:nowrap}
+    .section-title{height:32px;display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:15px;font-weight:600}
+    .section-title:before{content:"";width:4px;height:14px;background:var(--brand);border-radius:1px}
+    .section-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .section-actions .btn{font-weight:400}
+    .section-actions-divider{width:1px;height:18px;background:var(--line);margin:0 4px;flex:0 0 1px}
+    .table-wrap{width:100%;overflow:auto;border-radius:6px 6px 0 0}
+    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;font-size:14px;white-space:nowrap}
+    thead th{height:40px;background:var(--head);font-weight:500;color:#555;padding:0 12px;text-align:center}
+    thead th:first-child{border-radius:6px 0 0 0}
+    thead th:last-child{border-radius:0 6px 0 0}
+    tbody td{height:40px;padding:0 12px;text-align:center;border-bottom:0;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+    tbody tr:nth-child(even){background:var(--stripe)}
+    tbody tr:hover{background:#fff5f4}
+    .link-red{border:0;background:transparent;color:var(--brand);padding:0 4px;font-size:14px}
+    .link-red:hover{text-decoration:none}
+    .status{display:inline-flex;align-items:center;gap:6px}
+    .status:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green)}
+    .status.off:before{background:var(--brand)}
+    .status.pending:before{background:#f29b38}
+    .ellipsis{max-width:220px;display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+    .tag{display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;background:#e8f6ec;color:#349e4d;font-size:12px;line-height:18px}
+    .tag.orange{background:#fff1e8;color:#e87824}
+    .tag.gray{background:#f0f0f0;color:#777}
+    .pagination{display:flex;justify-content:center;align-items:center;gap:8px;padding:16px 0 4px;color:#666;font-size:13px}
+    .page-num{width:24px;height:24px;border:1px solid #e3e3e3;border-radius:4px;background:#fff;text-align:center;padding:0;font-size:13px}
+    .page-num.current{border-color:var(--brand);color:var(--brand)}
+    .page-go{width:54px;height:24px;border:1px solid #e3e3e3;border-radius:4px;background:#fff}
+    .page-size{height:24px;border:1px solid #e3e3e3;border-radius:4px;background:#fff;padding:0 5px;font-size:12px}
+    .warning-banner{height:40px;padding:0 16px;background:#fff7eb;border-radius:6px;display:flex;align-items:center;gap:8px;color:#555;margin-bottom:20px;font-size:14px}
+    .warning-icon{width:16px;height:16px;border-radius:50%;background:#fa7a19;color:white;text-align:center;font-size:12px;line-height:16px;font-weight:700}
+    .warning-banner strong{color:#F97316;font-weight:600}
+    .warning-banner button{border:0;background:transparent;color:#e8751a;padding:0;font-size:14px}
+    .group-head td{background:#f5f6f7!important;font-weight:600;text-align:left!important;height:40px}
+    .group-head.stripe-white td{background:#fff!important}
+    .group-head.stripe-gray td{background:var(--stripe)!important}
+    .group-head.expanded td{border-bottom:1px solid var(--line)}
+    .group-head:hover td{background:#fff5f4!important}
+    tbody tr.group-member.stripe-white{background:#fff}
+    tbody tr.group-member.stripe-gray{background:var(--stripe)}
+    tbody tr.group-member:hover{background:#fff5f4}
+    .group-head .group-name{display:inline-flex;align-items:center;gap:10px}
+    .group-expand{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex:0 0 16px;border:0;background:transparent;padding:0}
+    .group-expand img{display:block;width:12px;height:12px}
+    .group-count{font-size:12px;font-weight:400;color:#888}
+    .group-control{color:#888;border:0;background:transparent;padding:0 3px;font-size:14px}
+    .group-control img{display:block;width:14px;height:14px}
+    .group-control:hover{color:var(--brand)}
+    .table-gear{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;padding:0;cursor:pointer}
+    .table-gear img{display:block;width:18px;height:18px}
+    .empty-note{padding:36px;color:#999;text-align:center}
+    .back-row{display:flex;align-items:center;margin-bottom:12px}
+    .back-button{border:0;background:#f6f6f6;border-radius:4px;color:#666;padding:4px 8px;font-size:13px}
+    .detail-header{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px}
+    .detail-title{font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .detail-sub{color:#999;font-size:13px}
+    .detail-badge{background:#f2f4f6;padding:2px 7px;border-radius:4px;font-size:12px;color:#666;font-weight:400}
+    .content-card{background:#fff;border-radius:12px;padding:16px;min-height:calc(100vh - 240px)}
+    .weekly-page{height:calc(100vh - 60px);padding:20px;background:#f9f9f9;overflow:auto}
+    .weekly-detail-stack{height:100%;min-height:0;display:flex;flex-direction:column;gap:16px}
+    .weekly-summary-card{flex:0 0 auto;padding:20px;background:#fff;border-radius:12px}
+    .weekly-summary-copy{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+    .weekly-title-row{display:flex;align-items:center;gap:6px;min-height:20px}
+    .weekly-title{font-size:18px;font-weight:500;line-height:22px;color:#333;white-space:nowrap}
+    .weekly-meta-badge{display:inline-flex;align-items:center;gap:3px;padding:0 6px 0 4px;background:#f2f2f2;border-radius:4px;color:#333;font-size:13px;line-height:20px;white-space:nowrap}
+    .weekly-meta-icon{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px}
+    .weekly-meta-icon img{display:block;width:16px;height:16px}
+    .weekly-summary-org{font-size:14px;line-height:20px;color:#666;white-space:nowrap}
+    .weekly-table-card{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:20px;background:#fff;border-radius:12px}
+    .weekly-card-header{height:32px;flex:0 0 32px;display:flex;align-items:center;justify-content:space-between}
+    .weekly-card-title{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:500;line-height:20px;color:#333}
+    .weekly-card-title:before{content:"";width:4px;height:12px;background:var(--brand);border-radius:1px}
+    .weekly-year-select{display:inline-flex;width:max-content;min-width:0;height:32px;padding:0;border:0;border-radius:6px;background:#f5f6f7;color:#333;font-size:13px;outline:0;flex:0 0 auto}
+    .weekly-table-content{width:100%;display:flex;flex-direction:column;gap:16px}
+    .weekly-table-wrap{width:100%;border:1px solid #e5e5e5;border-radius:6px;overflow:hidden}
+    .weekly-table{width:100%;table-layout:fixed}
+    .weekly-table thead th{height:40px;padding:0 12px;background:#f5f6f7;color:#333;font-size:14px;font-weight:400;text-align:center}
+    .weekly-table tbody tr:nth-child(even){background:#fff}
+    .weekly-table tbody td{height:40px;padding:0 12px;border-bottom:1px solid #e3e4e5;color:#333;font-size:14px;text-align:center}
+    .weekly-table tbody tr:last-child td{border-bottom:0}
+    .muted{color:#999}
+    .overlay{position:fixed;inset:60px 0 0;padding:12px 20px 12px 0;background:rgba(0,0,0,.22);z-index:20;display:flex;justify-content:flex-end}
+    .drawer{height:100%;width:800px;max-width:calc(100vw - 260px);background:#fff;border-radius:12px;box-shadow:var(--drawer-shadow);position:relative;display:flex;flex-direction:column;overflow:hidden}
+    .drawer.wide-form{width:800px;max-width:calc(100vw - 280px)}
+    .drawer.wide{width:800px;max-width:calc(100vw - 280px)}
+    .drawer-header{height:56px;flex:0 0 56px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid transparent;font-weight:600}
+    .drawer-header:before{content:"";width:4px;height:14px;background:var(--brand);margin-right:8px}
+    .drawer-close{margin-left:auto;width:28px;height:28px;padding:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 28px}.drawer-close img{display:block;width:28px;height:28px}
+    .drawer-body{padding:0 18px 76px;overflow:auto;flex:1}
+    .drawer-footer{position:absolute;bottom:0;left:0;right:0;height:64px;background:#fff;border-top:0;display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:0 18px}
+    .drawer-footer .btn{height:36px;min-width:166px}
+    .drawer-footer .btn.primary{min-width:166px}
+    .drawer-title-dot{color:var(--brand);font-size:18px;margin-right:8px}
+    .field{margin-bottom:15px;min-width:0}
+    .field-label{display:block;margin-bottom:7px;font-size:13px;color:#444;line-height:16px}
+    .field-label.required:before{content:"*";color:var(--brand);margin-right:2px}
+    .control{width:100%;height:32px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;padding:0 11px;outline:0;font-size:13px}
+    .control:focus,.textarea:focus{border-color:#e99696;box-shadow:0 0 0 2px rgba(230,0,0,.06)}
+    .control:disabled{background:#f5f5f5;color:#999;cursor:not-allowed}
+    .control[readonly],.control:disabled{background:#f5f5f5;color:#777;cursor:not-allowed}
+    .input-with-action{display:flex;gap:8px;align-items:center}
+    .input-with-action .control{flex:1}
+    .icon-button{height:32px;width:32px;padding:0;border:1px solid #e0e0e0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 32px;cursor:pointer}.icon-button img{display:block;width:20px;height:20px}
+    .counter{font-size:11px;color:#aaa;margin-left:auto;float:right}
+    .textarea{width:100%;min-height:68px;border:1px solid #e0e0e0;border-radius:6px;padding:9px 11px;outline:0;resize:vertical;font-size:13px}
+    .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+    .item-sequence-field .control{width:376px}
+    .subject-code-fields{display:flex;flex-direction:column;gap:16px}
+    .subject-code-fields>.field{margin-bottom:0}
+    .subject-form-fields{display:flex;flex-direction:column;gap:16px}
+    .subject-form-fields>.field{margin-bottom:0}
+    .subject-form-fields>.selection-panel{margin:0}
+    .period-form-fields{display:flex;flex-direction:column;gap:16px}
+    .period-form-fields .field,.period-form-fields>.period-field-stack{margin:0}
+    .period-field-stack{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .period-form-fields .field-label{line-height:20px;margin-bottom:6px}
+    .period-form-fields .control,.period-form-fields .select-trigger{height:36px}
+    .period-form-fields .input-with-action .icon-button{height:36px;width:36px;flex-basis:36px}
+    .period-form-fields .radio-line{min-height:36px}
+    .period-form-fields .multi-select{min-height:36px}
+    .period-form-fields .textarea{height:80px;min-height:80px}
+    .period-form-fields .period-selection-panel{display:flex;flex-direction:column;gap:12px;margin:0;padding:16px;background:#f5f6f7;border-radius:6px}
+    .period-selection-panel .period-panel-title{font-size:14px;line-height:20px;color:#333}
+    .period-selection-panel .range-row{height:36px;margin:0;gap:8px}
+    .period-selection-panel .range-row .select-trigger,.period-selection-panel .range-row input{height:36px}
+    .period-selection-panel .week-end-control:disabled{background:#f1f2f3;color:#333;opacity:1;cursor:default}
+    .radio-line{display:flex;align-items:center;gap:18px;min-height:26px;font-size:13px}
+    .radio-line label,.check-line label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+    .radio-line.readonly label{cursor:default}
+    .radio-line.readonly{color:#333}
+    .radio-line.readonly input[type=radio]{appearance:none;-webkit-appearance:none;opacity:1;border:1px solid #e3e4e5;border-radius:50%;background:#f5f6f7}
+    .radio-line.readonly input[type=radio]:checked{border:4.67px solid #facfc8;background:#fff}
+    input[type=radio],input[type=checkbox]{accent-color:var(--brand);width:14px;height:14px;margin:0}
+    .selection-panel{background:#f5f6f7;border-radius:6px;padding:12px 14px;margin:8px 0 16px}
+    .range-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+    .range-row:first-child{margin-top:0}
+    .range-row select,.range-row input{height:32px;border:1px solid #e0e0e0;border-radius:6px;background:white;padding:0 10px;font-size:13px}
+    .range-row select{min-width:92px}
+    .range-row input{width:128px}
+    .range-label{min-width:40px;color:#666;font-size:13px}
+    .drawer .selection-panel .range-label{color:#333}
+    .range-caption{color:#888;font-size:12px}
+    .multi-select{min-height:32px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;padding:4px 11px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;cursor:pointer}
+    .multi-select:hover{border-color:#d5d5d5}
+    .multi-placeholder{color:#999;font-size:14px;line-height:20px}
+    .multi-pill{display:inline-flex;align-items:center;gap:4px;background:#f0f1f2;border-radius:4px;padding:3px 6px;color:#333;font-size:12px;max-width:100%}
+    .multi-pill span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px}
+    .multi-pill button{border:0;background:transparent;color:#aaa;padding:0;line-height:12px}
+    .multi-spacer{flex:1}
+    .inline-note{color:#888;font-size:12px;margin:6px 0 0}
+    .modal-layer{position:fixed;inset:60px 0 0;background:rgba(0,0,0,.3);z-index:30;display:flex;align-items:center;justify-content:center;padding:24px}
+    .modal{width:500px;max-width:calc(100vw - 80px);max-height:calc(100vh - 110px);background:#fff;border-radius:16px;box-shadow:0 14px 42px rgba(0,0,0,.16);display:flex;flex-direction:column;overflow:hidden}
+    .modal.medium{width:700px}
+    .modal.large{width:760px}
+    .modal-header{min-height:54px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid #eee;font-weight:600;font-size:15px}
+    .modal-header .alert-mark{width:16px;height:16px;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;line-height:16px;text-align:center;margin-right:8px}
+    .modal-header .modal-x{margin-left:auto;width:28px;height:28px;padding:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center;flex:0 0 28px}
+    .modal-header .modal-x img{display:block;width:28px;height:28px}
+    .modal-body{padding:16px 18px;overflow:auto}
+    .modal-footer{padding:0 18px 18px;display:flex;justify-content:flex-end;gap:10px}
+    .modal-footer .btn{min-width:84px}
+    .modal-footer:has(> .btn:only-child){justify-content:center}
+    .modal-footer:has(> .btn:only-child) > .btn{width:320px;max-width:100%}
+    .modal-footer.even .btn{flex:1}
+    .modal-footer.even [data-action="cancel-modal"]{background:#EEEFF0;border:0}
+    .modal-footer.even [data-action="cancel-modal"]:hover{background:#EEEFF0;border:0}
+    .subject-disable-modal{width:500px;height:208px;max-height:calc(100vh - 110px);padding:20px;border-radius:20px;gap:0}
+    .subject-disable-head{height:28px;flex:0 0 28px;width:100%;display:flex;align-items:center;justify-content:space-between}
+    .subject-disable-title{display:flex;align-items:center;gap:8px;color:#333;font-size:15px;font-weight:600;line-height:22px}
+    .subject-disable-modal .alert-mark{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;line-height:16px;margin:0;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;text-align:center;flex:0 0 16px}
+    .subject-disable-head .modal-x{margin-left:auto;width:28px;height:28px;padding:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center;flex:0 0 28px}
+    .subject-disable-head .modal-x img{display:block;width:28px;height:28px}
+    .subject-disable-divider{width:100%;height:1px;flex:0 0 1px;margin-top:15px;background:#e3e4e5}
+    .subject-disable-message{width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:22px 0;color:#333;text-align:center;font-size:15px;line-height:22px}
+    .subject-disable-actions{width:100%;height:36px;flex:0 0 36px;display:flex;align-items:center;justify-content:center;gap:20px}
+    .subject-disable-actions .btn{height:36px;min-width:96px;max-width:320px;flex:1;border:0;border-radius:6px;font-size:15px}
+    .subject-disable-actions .btn:not(.primary){background:#eeeff0;color:#333}
+    .subject-disable-actions .btn:not(.primary):hover{background:#eeeff0}
+    .subject-disable-actions .btn.primary{background:#e60000;border:0;color:#fff}
+    .language-form{padding-top:2px}
+    .language-row{margin-bottom:12px}
+    .language-label{display:flex;align-items:center;gap:5px;margin-bottom:5px;font-size:12px;color:#555}
+    .language-modal{width:520px;height:686px;max-height:calc(100vh - 100px)}
+    .language-modal .modal-header{min-height:66px;padding:0 20px;font-size:15px}
+    .language-modal .modal-body{padding:16px 20px;overflow:auto;flex:1;min-height:0}
+    .language-modal .language-row{margin-bottom:18px}
+    .language-modal .language-label{font-size:14px;margin-bottom:6px}
+    .language-modal .control{height:38px;border-radius:8px;font-size:14px}
+    .language-modal .btn.small{height:30px}
+    .language-modal .modal-footer{padding:0 20px 20px}
+    .language-dot{width:6px;height:6px;border-radius:50%;background:#40b35d}
+    .language-dot.empty{background:#bdbdbd}
+    .default-tag{background:#eee;color:#999;border-radius:3px;padding:1px 4px;font-size:10px}
+    .org-modal{width:835px}
+    .org-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:490px;min-height:0}
+    .org-pane{border:1px solid #e8e8e8;border-radius:8px;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+    .org-pane-head{height:38px;min-height:38px;background:#f5f6f7;padding:0 12px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
+    .org-pane-head label{display:inline-flex;align-items:center;gap:6px;line-height:1}
+    .org-pane-head label input[type=checkbox]{flex:0 0 14px}
+    .org-header-action-icon{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 14px}
+    .org-header-action-icon img{display:block;width:14px;height:14px}
+    .org-list{padding:8px 10px;flex:1;min-height:0;overflow:auto}
+    .org-pane:last-child .org-list{padding:0}
+    .org-node{height:34px;display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap}
+    .org-node .indent{display:inline-block;width:16px}
+    .org-node .tree-arrow{width:12px;color:#777;font-size:12px}
+    .org-selected-row{padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:13px}
+    .org-selected-row button{margin-left:auto;border:0;background:transparent;color:#999;font-size:16px}
+    .org-modal .modal-footer [data-action="cancel-modal"]{background:#EEEFF0;border:0}
+    .org-modal .modal-footer [data-action="cancel-modal"]:hover{background:#EEEFF0;border:0}
+    .profile-card{background:#f5f6f7;border-radius:6px;padding:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:13px 12px;margin-bottom:18px}
+    .profile-cell label{display:block;color:#999;font-size:12px;margin-bottom:4px}
+    .profile-cell strong{font-weight:500;font-size:13px}
+    .subsection-title{font-size:14px;font-weight:600;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+    .subsection-title:before{content:"";width:4px;height:14px;background:var(--brand);border-radius:1px}
+    .salary-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+    .history-layout{display:grid;grid-template-columns:230px 1fr;min-height:475px;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden}
+    .history-list{border-right:1px solid #e8e8e8;background:#fff}
+    .history-head{height:40px;background:#f5f6f7;padding:0 10px;display:flex;align-items:center;font-weight:500;color:#666}
+    .history-item{min-height:58px;padding:8px 10px;border-left:2px solid transparent;position:relative;cursor:pointer}
+    .history-item:hover{background:#fafafa}
+    .history-item.selected{background:#fff1f1;border-left-color:var(--brand)}
+    .history-date{font-size:13px;margin-bottom:4px;color:#555}
+    .history-item.selected .history-date{color:var(--brand)}
+    .history-statuses{display:flex;gap:4px}
+    .history-statuses .tag{font-size:10px;line-height:15px;padding:0 4px}
+    .history-trash{position:absolute;right:7px;top:8px;border:0;background:transparent;color:#aaa;padding:1px;font-size:14px}
+    .history-detail{padding:0 12px 12px;overflow:auto}
+    .history-toolbar{height:40px;background:#f5f6f7;margin:0 -12px 12px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;color:#666}
+    .history-toolbar .btn{height:24px;padding:0 10px;font-size:12px}
+    .detail-info-box{background:#f5f6f7;border-radius:5px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px;margin:8px 0 14px}
+    .detail-info-box label{color:#999;display:block;margin-bottom:3px}
+    .value-table{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:12px}
+    .value-table th{height:28px;background:#f5f6f7;font-weight:500;color:#777}
+    .value-table td{height:30px;text-align:center;padding:0 8px}
+    .value-table tbody tr:nth-child(even){background:#f8f9fa}
+    .value-red{color:var(--brand)}
+    .value-green{color:#32a54c}
+    .tip-pill{position:relative}
+    .tooltip{position:absolute;right:0;top:28px;background:#333;color:#fff;font-size:12px;padding:7px 9px;border-radius:4px;white-space:nowrap;z-index:4;display:none}
+    .tip-pill:hover .tooltip{display:block}
+    .subject-disabled-action{display:inline-block;position:relative;padding:0 4px;color:#999;cursor:not-allowed;white-space:nowrap;z-index:10}
+    .subject-disabled-action .tooltip{left:auto;right:0;top:auto;bottom:calc(100% + 6px);transform:none;z-index:30}
+    .subject-table tbody tr.group-member td:last-child{overflow:visible;position:relative}
+    .column-modal{width:750px}
+    .column-modal .modal-footer [data-action="cancel-modal"]{background:#EEEFF0;border:0}
+    .column-modal .modal-footer [data-action="cancel-modal"]:hover{background:#EEEFF0;border:0}
+    .column-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .column-pane{height:540px;min-height:0;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+    .column-head{height:38px;min-height:38px;flex:0 0 38px;background:#f5f6f7;padding:0 10px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
+    .column-head .group-control{width:18px;height:18px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+    .column-head .group-control img{display:block;width:14px;height:14px}
+    .column-search{height:32px;min-height:32px;flex:0 0 32px;border:1px solid #e7e7e7;border-radius:5px;margin:8px;width:calc(100% - 16px);padding:0 9px;font-size:14px}
+    .column-options-scroll,.column-selected-list{flex:1;min-height:0;overflow:auto}
+    .column-section-title{padding:8px 10px;font-weight:600;background:#fafafa;font-size:14px}
+    .column-option{height:40px;display:flex;align-items:center;padding:0 10px;font-size:14px;gap:6px}
+    .column-selected{height:40px;display:flex;align-items:center;padding:0 10px;gap:8px;font-size:14px}
+    .drag-handle{color:#777;font-size:13px;cursor:grab}
+    .column-selected .remove{margin-left:auto;color:#aaa;border:0;background:transparent;font-size:16px}
+    .upload-items{background:#f5f6f7;border-radius:6px;padding:10px 12px;margin-bottom:18px}
+    .upload-item-line{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .download-link{border:0;background:transparent;color:var(--brand);padding:12px 0 0;font-size:12px}
+    .upload-drop{height:120px;border:1px dashed #d5d5d5;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#888;font-size:12px;gap:6px;background:#fff}
+    .upload-icon{height:38px;width:38px;border-radius:50%;background:#f5f6f7;display:flex;align-items:center;justify-content:center;color:#999;font-size:21px}
+    .file-green{font-size:24px;color:#2ca566}
+    .file-name{color:#555;font-size:12px}
+    .file-row{display:flex;align-items:center;justify-content:center;gap:10px}
+    .batch-import-modal{width:700px;height:466px;max-height:calc(100vh - 108px);padding:20px;gap:22px;border-radius:20px}
+    .batch-import-content{width:100%;height:368px;flex:0 0 368px;display:flex;flex-direction:column;gap:16px;min-height:0}
+    .batch-import-section{width:100%;display:flex;flex:0 0 auto;flex-direction:column;gap:12px;min-width:0}
+    .batch-import-template-section{height:148px}
+    .batch-import-upload-section{height:204px}
+    .batch-import-title{height:32px;flex:0 0 32px;display:flex;align-items:center;gap:6px;color:#333;font-size:15px;font-weight:500;line-height:22px;white-space:nowrap}
+    .batch-import-title:before{content:"";width:3px;height:10px;flex:0 0 3px;border-radius:.5px;background:var(--brand)}
+    .batch-import-template-panel{height:104px;flex:0 0 104px;width:100%;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f5f6f7;border-radius:8px}
+    .batch-import-items{height:20px;flex:0 0 20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:12px;align-items:center}
+    .batch-import-option{min-width:0;height:20px;display:inline-flex;align-items:center;gap:8px;color:#333;font-size:14px;line-height:20px;white-space:nowrap}
+    .batch-import-option input[type="checkbox"]{width:14px;height:14px;flex:0 0 14px;margin:0;accent-color:var(--brand)}
+    .batch-import-option-text{min-width:0;white-space:nowrap}
+    .batch-import-disabled-tag{height:18px;flex:0 0 auto;padding:0 4px;display:inline-flex;align-items:center;border-radius:3px;background:#e3e4e5;color:#666;font-size:12px;line-height:16px}
+    .batch-import-divider{position:relative;width:100%;height:0;flex:0 0 0}
+    .batch-import-divider:after{content:"";position:absolute;top:0;left:0;right:0;border-top:1px dashed #d5d5d5}
+    .batch-import-download{height:28px;flex:0 0 28px;width:max-content;display:inline-flex;align-items:center;gap:6px;padding:2px 0;border:0;border-radius:4px;background:transparent;color:var(--brand);font-size:13px;line-height:18px;white-space:nowrap}
+    .batch-import-download img{display:block;width:14px;height:14px;flex:0 0 14px}
+    .batch-import-drop{height:160px;flex:0 0 160px;width:100%;padding:24px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px dashed #ccc;border-radius:8px;background:#fff;color:#333}
+    .batch-import-upload-icon{width:50px;height:50px;flex:0 0 50px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#f5f6f7}
+    .batch-import-upload-icon img{display:block;width:21.667px;height:21.667px}
+    .batch-import-upload-copy{display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:400;text-align:center}
+    .batch-import-upload-prompt{font-size:14px;line-height:20px;color:#333;white-space:nowrap}
+    .batch-import-upload-prompt button{padding:0;border:0;background:transparent;color:var(--brand);font-size:14px;line-height:20px}
+    .batch-import-upload-hint{font-size:12px;line-height:18px;color:#999;white-space:nowrap}
+    .batch-import-file{display:flex;flex-direction:column;align-items:center;gap:12px;color:#333}
+    .batch-import-file-name{max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#555;font-size:14px;line-height:20px}
+    .batch-import-file-actions{display:flex;align-items:center;gap:12px}
+    .batch-import-file-actions .link-red{font-size:13px}
+    .batch-import-footer{width:100%;height:36px;flex:0 0 36px;display:flex;align-items:center;justify-content:flex-end;gap:10px}
+    .batch-import-footer .btn{width:96px;min-width:96px;height:36px;padding:0 16px;border:0;border-radius:6px;font-size:15px;line-height:22px}
+    .batch-import-footer [data-action="cancel-modal"]{background:#eeeff0;color:#333}
+    .batch-import-footer [data-action="cancel-modal"]:hover{background:#eeeff0}
+    .batch-import-footer .btn.primary{background:#e60000;border-color:#e60000;color:#fff}
+    .toast{position:fixed;top:76px;left:50%;transform:translateX(-50%);z-index:60;background:#fff;border-radius:6px;box-shadow:0 6px 22px rgba(0,0,0,.16);padding:11px 18px;font-size:13px;display:flex;gap:8px;align-items:center}
+    .toast:before{content:"✓";width:18px;height:18px;border-radius:50%;background:#35ab59;color:#fff;text-align:center;line-height:18px;font-size:12px}
+    .toast.error:before{content:"!";background:#e60000}
+    .toast.error{color:#b44}
+    .disabled-tip{color:#aaa;cursor:not-allowed}
+    .system-badge{background:#eceff1;color:#666;padding:1px 5px;border-radius:3px;font-size:11px;margin-left:4px}
+    .hidden{display:none!important}
+    @media(max-width:1440px){
+      .layout{grid-template-columns:205px minmax(0,1fr);gap:10px;padding:16px}
+      .workspace{padding:16px}
+      .toolbar{gap:6px}
+      .toolbar-query-actions{gap:6px}
+      .filter-chip{padding-left:9px}
+      thead th,tbody td{padding-left:8px;padding-right:8px}
+    }
+    input:not([type=radio]):not([type=checkbox]):not(:disabled):not([readonly]),textarea:not(:disabled),select:not(:disabled){color:#333}
+    input:not([type=radio]):not([type=checkbox]):placeholder-shown:not(:disabled):not([readonly]),textarea:placeholder-shown:not(:disabled){color:#999}
+    input:not([type=radio]):not([type=checkbox])::placeholder,textarea::placeholder{color:#999;opacity:1}
+    select{-webkit-appearance:none;appearance:none;background-image:url("assets/figma-icons/select-arrow.svg")!important;background-repeat:no-repeat!important;background-position:right 8px center!important;background-size:16px 16px!important;padding-left:11px!important;padding-right:32px!important}
+    .select-wrap{position:relative;display:block;min-width:0}
+    .select-wrap.form-select,.select-wrap.range-unit{width:100%}
+    .select-trigger{width:100%;height:32px;padding:0 11px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;color:#999;font-size:13px;line-height:normal;white-space:nowrap}
+    .select-trigger:hover,.select-trigger.open{border-color:#d5d5d5}
+    .select-trigger:disabled{background:#f5f5f5;color:#777;cursor:not-allowed}
+    .select-trigger.has-value:not(:disabled) .select-value{color:#333}
+    .select-value{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .select-arrow{display:block;width:16px;height:16px;flex:0 0 16px;transition:transform .15s}
+    .select-trigger.open .select-arrow{transform:rotate(180deg)}
+    .select-menu{top:calc(100% + 5px);min-width:max(100%,180px)}
+    .select-option{width:100%;height:32px;padding:0 9px;border:0;border-radius:5px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;color:#333;font-size:13px;white-space:nowrap}
+    .select-option:hover{background:#f5f5f5}
+    .select-option-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .select-option-check{width:14px;height:14px;flex:0 0 14px;display:inline-flex;align-items:center;justify-content:center;color:#e60000;font-size:14px;font-weight:600;line-height:14px}
+    .range-row .select-wrap{display:inline-flex;flex:0 0 auto}
+    .range-row .select-trigger{width:auto;height:32px;min-width:92px;padding:0 11px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;font-size:13px}
+    .range-row .range-month .select-trigger{min-width:80px}
+    .range-row .range-day .select-trigger{min-width:92px}
+    .range-row .select-wrap.range-unit{display:block;flex:1;width:auto;min-width:0}
+    .range-row .range-unit .select-trigger{width:100%;min-width:0}
+    .drawer .selection-panel .range-row .select-wrap.range-unit{flex:0 0 120px;width:120px;min-width:120px}
+    .page-size-select{display:inline-flex;flex:0 0 auto}
+    .page-size-select .select-trigger{width:auto;min-width:72px;height:24px;padding:0 26px 0 11px;border:1px solid #e3e3e3;border-radius:4px;background:#fff;font-size:12px}
+    .weekly-year-select{display:inline-flex;width:max-content;min-width:0;height:auto;padding:0;border:0;border-radius:6px;background:#f5f6f7;flex:0 0 auto}
+    .weekly-year-select .select-trigger{display:inline-flex;width:max-content;min-width:0;height:32px;padding:0 8px 0 10px;border:0;border-radius:6px;background:transparent;color:#333;font-size:13px;outline:0;gap:6px;flex:0 0 auto}
+    .weekly-year-select .select-value{flex:0 0 auto}
+    .weekly-year-select .select-arrow{width:12px;height:12px;flex-basis:12px}
+    .drawer{font-size:15px}
+    .drawer table{font-size:15px}
+    .drawer .field-label,.drawer .control,.drawer .textarea,.drawer .radio-line,.drawer .range-row input,.drawer .range-label,.drawer .select-trigger,.drawer .select-option,.drawer .filter-option,.drawer .profile-cell strong,.drawer .history-date,.drawer .btn{font-size:14px}
+    .drawer .range-row .select-trigger{font-size:14px}
+    .drawer .subsection-title,.drawer .history-trash,.drawer .select-option-check,.drawer .link-red{font-size:15px}
+
+    .drawer.salary-entry-drawer{width:800px;max-width:calc(100vw - 280px);padding:20px;gap:20px}
+    .salary-entry-content{display:flex;min-height:0;flex:1 1 auto;flex-direction:column;gap:20px}
+    .salary-entry-section{display:flex;min-width:0;flex:0 0 auto;flex-direction:column;gap:12px}
+    .salary-entry-profile-section{height:180px;flex-basis:180px}
+    .salary-entry-form-section{min-height:0;flex:1 1 auto}
+    .salary-entry-title{display:flex;height:32px;min-width:0;flex:0 0 32px;align-items:center;gap:6px;color:#333;font-size:15px;font-weight:500;line-height:22px}
+    .salary-entry-title:before{content:"";width:3px;height:10px;flex:0 0 3px;border-radius:.5px;background:var(--brand)}
+    .salary-entry-title .drawer-close{margin-left:auto}
+    .salary-entry-drawer .archive-profile-card{height:136px;flex:0 0 136px;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:44px;gap:16px 20px;box-sizing:border-box;margin:0;padding:16px;border-radius:6px;background:#f5f6f7}
+    .salary-entry-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;min-width:0}
+    .salary-entry-fields>.field{min-width:0;margin:0}
+    .salary-entry-fields .field-label{height:20px;margin:0 0 6px;color:#333;font-size:14px;line-height:20px}
+    .salary-entry-fields .control,.salary-entry-fields .select-trigger{box-sizing:border-box;width:100%;height:36px;border:1px solid #e3e4e5;border-radius:8px;background:#fff;color:#333;font-size:14px;line-height:20px}
+    .salary-entry-fields .control{padding:0 12px}
+    .salary-entry-fields .control[readonly]{border-color:#e3e4e5;background:#f5f6f7;color:#333}
+    .salary-entry-fields .select-wrap{width:100%;min-width:0}
+    .salary-entry-fields .select-trigger{justify-content:space-between;padding:0 8px 0 12px}
+    .salary-entry-fields .select-value{font-size:14px}
+    .salary-entry-fields .salary-entry-note{grid-column:1 / -1}
+    .salary-entry-fields .salary-entry-note .textarea{box-sizing:border-box;width:100%;height:80px;min-height:80px;padding:10px 12px;border:1px solid #e3e4e5;border-radius:8px;font-size:14px;line-height:20px}
+    .salary-entry-footer{display:flex;height:36px;flex:0 0 36px;align-items:center;justify-content:flex-end;gap:10px}
+    .salary-entry-footer .btn{height:36px;min-width:166px}
+
+    /* Archive detail drawer: match Figma node 151:25695 */
+    .archive-detail-drawer{width:1000px;max-width:calc(100vw - 280px);padding:20px;gap:20px}
+    .archive-detail-content{display:flex;flex:1;flex-direction:column;gap:20px;min-height:0;overflow:hidden}
+    .archive-top-section{display:flex;flex:0 0 180px;flex-direction:column;gap:12px;min-height:0}
+    .archive-detail-title{height:32px;flex:0 0 32px;padding:0;border:0;font-size:15px;line-height:22px;font-weight:500}
+    .archive-detail-drawer .archive-detail-title:before{width:3px;height:10px;flex:0 0 3px;margin-right:6px;border-radius:.5px}
+    .archive-detail-drawer .archive-close{position:absolute;top:20px;right:20px;z-index:2;margin:0}
+    .archive-profile-card{height:136px;flex:0 0 136px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:44px;gap:16px 20px;box-sizing:border-box;padding:16px;background:#f5f6f7;border-radius:6px}
+    .archive-profile-cell{display:flex;min-width:0;flex-direction:column;gap:4px;font-size:14px;line-height:20px}
+    .archive-profile-label{color:#6b6e77;white-space:nowrap}
+    .archive-profile-value{display:flex;min-width:0;align-items:center;gap:4px;color:#333;line-height:20px;white-space:nowrap}
+    .archive-profile-tags{display:inline-flex;align-items:center;gap:4px}
+    .archive-profile-tags .tag{height:18px;padding:0 4px;border-radius:2px;background:#4caf50;color:#fff;font-size:12px;font-weight:500;line-height:18px}
+    .archive-profile-tags .tag.orange{background:#f97316;color:#fff}
+    .archive-history-section{display:flex;flex:1;flex-direction:column;gap:12px;min-height:0}
+    .archive-section-heading{display:flex;height:32px;flex:0 0 32px;align-items:center;justify-content:space-between}
+    .archive-section-heading-label{display:flex;align-items:center;gap:6px;color:#333;font-size:15px;font-weight:500;line-height:22px}
+    .archive-title-mark{width:3px;height:10px;flex:0 0 3px;border-radius:.5px;background:#e60000}
+    .archive-section-heading .archive-start-adjust{width:72px;height:28px;padding:0 10px;border:1px solid #f0b8b8;border-radius:6px;background:#fff;color:#e60000;font-size:13px;line-height:20px}
+    .archive-detail-drawer .history-layout{display:grid;height:auto;min-height:0;flex:1;grid-template-columns:230px minmax(0,1fr);border:1px solid #e5e5e5;border-radius:6px;box-shadow:none;overflow:hidden}
+    .archive-detail-drawer .history-list{display:flex;min-width:0;min-height:0;flex-direction:column;border-right:1px solid #e5e5e5;overflow:hidden}
+    .archive-detail-drawer .history-head{height:44px;flex:0 0 44px;padding:0 12px;border-bottom:1px solid #e5e5e5;background:#f5f6f7;color:#666;font-size:15px;font-weight:400;line-height:20px}
+    .history-items{position:relative;flex:1;min-height:0;overflow:auto}
+    .history-timeline-line{position:absolute;top:22px;left:17.5px;z-index:0;width:1px;height:270px;pointer-events:none}
+    .archive-detail-drawer .history-item{position:relative;z-index:1;display:flex;height:68px;min-height:68px;flex:0 0 68px;flex-direction:column;justify-content:flex-start;box-sizing:border-box;padding:12px;border:0;cursor:pointer}
+    .archive-detail-drawer .history-item.selected:before{position:absolute;top:0;bottom:0;left:0;width:2px;background:#e60000;content:""}
+    .archive-detail-drawer .history-date{display:flex;align-items:center;gap:12px;margin:0 0 6px;color:#333;font-size:14px;line-height:20px}
+    .archive-detail-drawer .history-item.selected .history-date{color:#e60000}
+    .archive-detail-drawer .history-marker{position:relative;z-index:2;display:block;width:12px;height:12px;flex:0 0 12px}
+    .archive-detail-drawer .history-statuses{display:flex;gap:4px;padding-left:24px}
+    .archive-detail-drawer .history-statuses .tag{box-sizing:border-box;display:inline-flex;height:18px;align-items:center;justify-content:center;padding:0 4px;border:1px solid;border-radius:3px;font-size:12px;font-weight:400;line-height:16px;white-space:nowrap}
+    .archive-detail-drawer .history-statuses .tag.kind-adjust{border-color:#f97316;background:#fef6ec;color:#f97316}
+    .archive-detail-drawer .history-statuses .tag.kind-neutral,.archive-detail-drawer .history-statuses .tag.status-history{border-color:#e5e5e5;background:#f5f6f7;color:#666}
+    .archive-detail-drawer .history-statuses .tag.status-pending{border-color:#165dff;background:#edf4ff;color:#165dff}
+    .archive-detail-drawer .history-statuses .tag.status-current{border-color:#e60000;background:#fdebe8;color:#e60000}
+    .archive-detail-drawer .history-trash{position:absolute;top:12px;right:10px;display:flex;width:16px;height:16px;align-items:center;justify-content:center;padding:0;border:0;background:transparent;cursor:pointer}
+    .archive-detail-drawer .history-trash img{display:block;width:16px;height:16px}
+    .archive-detail-drawer .history-trash.disabled-tip{cursor:not-allowed;opacity:.55}
+    .archive-detail-drawer .history-pane{display:flex;min-width:0;min-height:0;flex-direction:column;overflow:hidden}
+    .archive-detail-drawer .history-toolbar{display:flex;height:44px;flex:0 0 44px;align-items:center;justify-content:space-between;margin:0;padding:0 12px;border-bottom:1px solid #e5e5e5;background:#f5f6f7;color:#666;font-size:15px;line-height:20px}
+    .archive-detail-drawer .history-toolbar .btn{width:54px;height:28px;padding:0 10px;border:1px solid #e3e4e5;border-radius:6px;background:#fff;color:#333;font-size:13px;line-height:20px}
+    .archive-detail-drawer .history-toolbar .btn:disabled{border-color:#e3e4e5;color:#c8c8c8;background:#fff}
+    .archive-detail-drawer .history-detail{display:flex;min-width:0;min-height:0;flex:1;flex-direction:column;gap:16px;overflow:auto;padding:20px 12px}
+    .archive-detail-block{display:flex;flex:0 0 auto;flex-direction:column;gap:12px;min-width:0}
+    .archive-detail-subtitle{display:flex;height:20px;flex:0 0 20px;align-items:center;gap:6px;color:#333;font-size:14px;font-weight:500;line-height:20px}
+    .archive-detail-subtitle .archive-title-mark{width:3px;height:10px}
+    .archive-detail-drawer .detail-info-box{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 20px;box-sizing:border-box;margin:0;padding:16px;border-radius:6px;background:#f5f6f7;font-size:14px;line-height:20px}
+    .archive-detail-drawer .detail-info-box.archive-main-info{height:136px;flex:0 0 136px}
+    .archive-detail-drawer .detail-info-box.archive-operation-info{height:76px;flex:0 0 76px}
+    .archive-detail-drawer .detail-info-box>div{display:flex;min-width:0;flex-direction:column;gap:4px;color:#333;font-size:14px;line-height:20px}
+    .archive-detail-drawer .detail-info-box label{display:block;margin:0;color:#6b6e77;font-size:14px;line-height:20px;white-space:nowrap}
+    .archive-info-value{overflow:hidden;color:#333;font-size:14px;line-height:20px;text-overflow:ellipsis;white-space:nowrap}
+    .archive-detail-drawer .value-table{width:100%;border-collapse:collapse;border-spacing:0;table-layout:fixed;font-size:14px;line-height:20px;white-space:nowrap}
+    .archive-detail-drawer .value-table th{height:40px;padding:0 8px;background:#f5f6f7;color:#6b6e77;font-size:14px;font-weight:500;line-height:20px}
+    .archive-detail-drawer .value-table td{height:40px;padding:0 8px;color:#333;font-size:14px;line-height:20px;text-align:center}
+    .archive-detail-drawer .value-table tbody tr:nth-child(odd){background:#fff}
+    .archive-detail-drawer .value-table tbody tr:nth-child(even){background:#f9fafb}
+    .archive-detail-drawer .value-table tbody tr:hover{background:inherit}
+    .archive-detail-footer{display:flex;height:36px;flex:0 0 36px;align-items:center;justify-content:flex-end}
+    .archive-detail-footer .btn{width:200px;height:36px;flex:0 0 200px;padding:0 16px;border:1px solid #e3e4e5;border-radius:6px;background:#fff;color:#333;font-size:15px;line-height:22px}
+    @media(max-width:1100px){.archive-detail-drawer{max-width:calc(100vw - 40px)}.archive-detail-drawer .history-layout{grid-template-columns:210px minmax(0,1fr)}.archive-profile-card{gap:16px 12px}}
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    (function(){
+      'use strict';
+      var STORAGE_KEY='payroll-prototype-v1';
+      var languages=[{key:'zh',name:'简体中文',default:true},{key:'en',name:'English'},{key:'th',name:'ไทย'},{key:'vi',name:'Tiếng Việt'},{key:'ms',name:'Bahasa Melayu'},{key:'ar',name:'العربية'}];
+      var employees=[
+        {id:'EMP10001',no:'01873362',name:'李宏涛',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10002',no:'01873362',name:'赵子峰',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10003',no:'01873362',name:'李婷',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10004',no:'01873362',name:'李松林',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10005',no:'01873362',name:'冯玉杰',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10006',no:'01873362',name:'李淑萍',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10007',no:'01873362',name:'冯冬梅',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10008',no:'01873362',name:'孙御宾',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10009',no:'01873362',name:'孙玉轩',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10010',no:'01873362',name:'冯丽妍',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-10-01',currency:'THB',needSalary:false},
+        {id:'EMP10011',no:'01874801',name:'陈佳佳',dept:'运营部-曼谷分拨',job:'运营专员',group:'TH-BKK',date:'2026-11-01',currency:'THB',needSalary:true},
+        {id:'EMP10012',no:'01874802',name:'王春华',dept:'运营部-曼谷分拨',job:'分拣员',group:'TH-BKK',date:'2026-11-01',currency:'THB',needSalary:true},
+        {id:'EMP10013',no:'01874803',name:'陈伟',dept:'运营部-曼谷分拨',job:'快递员',group:'TH-BKK',date:'2026-11-01',currency:'THB',needSalary:true}
+      ];
+      var defaultGroups=[
+        {id:'g1',code:'TH_BNT',name:'泰国BNT总部薪资组方案',country:'泰国',currency:'THB',scope:'custom',orgs:['J&T集团-集团总部-产研中心-产研标准化部-HR系统研发'],status:'启用',desc:'泰国BNT自然月',creator:'孙楚一',created:'2026-11-05 19:42:44'},
+        {id:'g2',code:'TH_BKK',name:'泰国BKK薪资组',country:'泰国',currency:'THB',scope:'custom',orgs:['10000021-奥索斯'],status:'启用',desc:'泰国BNT自然月',creator:'李响',created:'2026-11-05 19:42:44'},
+        {id:'g3',code:'TH_FACTORY',name:'泰国工厂薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'启用',desc:'泰国BNT自然月',creator:'周翠娥',created:'2026-11-05 19:42:44'},
+        {id:'g4',code:'VN_SGN',name:'越南胡志明薪资组',country:'越南',currency:'VND',scope:'all',orgs:[],status:'停用',desc:'越南薪资方案',creator:'周晟',created:'2026-11-05 19:42:44'},
+        {id:'g5',code:'TH_BNT_2',name:'泰国BNT运营薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'停用',desc:'泰国BNT自然月',creator:'王嘉琪',created:'2026-11-05 19:42:44'},
+        {id:'g6',code:'TH_BNT_3',name:'泰国BNT分拨薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'停用',desc:'泰国BNT自然月',creator:'冯雪梅',created:'2026-11-05 19:42:44'},
+        {id:'g7',code:'TH_BNT_4',name:'泰国BNT客服薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'停用',desc:'泰国BNT自然月',creator:'冯新玲',created:'2026-11-05 19:42:44'},
+        {id:'g8',code:'TH_BNT_5',name:'泰国BNT直营网薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'停用',desc:'泰国BNT自然月',creator:'周瀛',created:'2026-11-05 19:42:44'},
+        {id:'g9',code:'TH_BNT_6',name:'泰国BNT管理薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'停用',desc:'泰国BNT自然月',creator:'周翠娥',created:'2026-11-05 19:42:44'},
+        {id:'g10',code:'TH_BNT_7',name:'泰国BNT总部员工薪资组',country:'泰国',currency:'THB',scope:'all',orgs:[],status:'停用',desc:'泰国BNT自然月',creator:'冯长安',created:'2026-11-05 19:42:44'}
+      ];
+      var defaultItems=[
+        {id:'i1',seq:10,code:'BASE_SALARY',name:'基本工资',translations:{en:'Basic Salary',th:'เงินเดือนพื้นฐาน',vi:'Lương cơ bản'},type:'数值',unit:'月',scope:'自定义',status:'启用',desc:'员工基本工资',creator:'孙楚一'},
+        {id:'i2',seq:20,code:'FIXED_ALLOW',name:'固定津贴',translations:{en:'Fixed Allowance',th:'เบี้ยเลี้ยงคงที่'},type:'数值',unit:'月',scope:'全部薪资组',status:'启用',desc:'按月固定发放的津贴',creator:'李响'},
+        {id:'i3',seq:30,code:'TRAFFIC_ALLOW',name:'交通津贴',translations:{en:'Traffic Allowance'},type:'数值',unit:'月',scope:'全部薪资组',status:'启用',desc:'泰国交通补贴',creator:'周翠娥'},
+        {id:'i4',seq:40,code:'NIGHT_ALLOW',name:'夜班津贴',translations:{en:'Night Shift Allowance'},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'周晟'},
+        {id:'i5',seq:50,code:'NIGHT_ALLOW_2',name:'夜班津贴',translations:{},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'王嘉琪'},
+        {id:'i6',seq:60,code:'NIGHT_ALLOW_3',name:'夜班津贴',translations:{},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'冯雪梅'},
+        {id:'i7',seq:70,code:'NIGHT_ALLOW_4',name:'夜班津贴',translations:{},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'冯新玲'},
+        {id:'i8',seq:80,code:'NIGHT_ALLOW_5',name:'夜班津贴',translations:{},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'周瀛'},
+        {id:'i9',seq:90,code:'NIGHT_ALLOW_6',name:'夜班津贴',translations:{},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'周翠娥'},
+        {id:'i10',seq:100,code:'NIGHT_ALLOW_7',name:'夜班津贴',translations:{},type:'数值',unit:'月',scope:'全部薪资组',status:'停用',desc:'夜班津贴',creator:'冯长安'}
+      ];
+      var defaultSubjectGroups=[
+        {id:'sg1',name:'员工信息',translations:{en:'Employee Information'},expanded:false,items:[
+          {id:'s1',code:'EMP_NO',name:'工号（系统）',type:'文本',scope:'越南-销售...',status:'启用',desc:'系统预置科目',creator:'周翠娥',system:true},
+          {id:'s2',code:'EMP_NAME',name:'员工姓名（系统）',type:'文本',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'周晟',system:true},
+          {id:'s3',code:'DEPT',name:'部门（系统）',type:'文本',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'王嘉琪',system:true},
+          {id:'s4',code:'HIRE_DATE',name:'入职日期（系统）',type:'日期',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'冯雪梅',system:true}
+        ]},
+        {id:'sg2',name:'应发工资',translations:{en:'Gross Salary'},expanded:true,items:[
+          {id:'s5',code:'EMP_NO',name:'工号（系统）',type:'文本',scope:'越南-销售...',status:'启用',desc:'系统预置科目',creator:'周翠娥',system:true},
+          {id:'s6',code:'EMP_NAME',name:'员工姓名（系统）',type:'文本',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'周晟',system:true},
+          {id:'s7',code:'DEPT',name:'部门（系统）',type:'文本',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'王嘉琪',system:true},
+          {id:'s8',code:'HIRE_DATE',name:'入职日期（系统）',type:'日期',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'冯雪梅',system:true}
+        ]},
+        {id:'sg3',name:'应发工资',translations:{},expanded:true,items:[
+          {id:'s9',code:'BASE_SALARY',name:'基本工资',type:'数值',scope:'全部组织',status:'启用',desc:'系统预置科目',creator:'周瀛',system:true},
+          {id:'s10',code:'EMP_NAME',name:'员工姓名（系统）',type:'文本',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'周翠娥',system:true},
+          {id:'s11',code:'DEPT',name:'部门（系统）',type:'文本',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'冯长安',system:true},
+          {id:'s12',code:'HIRE_DATE',name:'入职日期（系统）',type:'日期',scope:'全部组织',status:'停用',desc:'系统预置科目',creator:'冯长安',system:true}
+        ]},
+        {id:'sg4',name:'应发工资',translations:{},expanded:false,items:[]},
+        {id:'sg5',name:'实发工资',translations:{en:'Net Salary'},expanded:false,items:[]}
+      ];
+      var defaultPeriods=[
+        {id:'p1',name:'泰国-代理区A(16-31)自然月',scope:'全部组织',cycle:'月薪',first:'2026-11-09',status:'启用',desc:'泰国BNT自然月',creator:'孙楚一'},
+        {id:'p2',name:'泰国BNT自然月',scope:'J&T集团-集团总部-产研...',cycle:'月薪',first:'2026-10-31',status:'启用',desc:'泰国BNT自然月',creator:'李响'},
+        {id:'p3',name:'泰国-代理区A(1-15)半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-27',status:'启用',desc:'泰国BNT自然月',creator:'周翠娥'},
+        {id:'p4',name:'泰国-代理区A(16-31)半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-27',status:'停用',desc:'泰国BNT自然月',creator:'周晟'},
+        {id:'p5',name:'泰国工厂区半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-18',status:'停用',desc:'泰国BNT自然月',creator:'王嘉琪'},
+        {id:'p6',name:'泰国-代理区A(1-15)半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-17',status:'停用',desc:'泰国BNT自然月',creator:'冯雪梅'},
+        {id:'p7',name:'越南-快递员周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'启用',desc:'周薪考勤周期一致',creator:'冯新玲'},
+        {id:'p8',name:'泰国-快递员周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'停用',desc:'泰国BNT自然月',creator:'周瀛'},
+        {id:'p9',name:'越南-快递员周薪2',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'停用',desc:'泰国BNT自然月',creator:'周翠娥'},
+        {id:'p10',name:'越南-快递员周薪3',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'停用',desc:'泰国BNT自然月',creator:'冯长安'}
+      ];
+      var defaultArchive={};
+      employees.forEach(function(emp,index){
+        var base=28000,indexExtra=index%3;
+        if(emp.needSalary)return;
+        defaultArchive[emp.id]=[
+          {id:'r'+emp.id+'-2026-12-01',date:'2026-12-01',kind:'调薪',status:'待生效',currency:emp.currency,reason:'年度调薪',note:'',items:{'基本工资':base+2000,'固定津贴':1500,'交通津贴':800},locked:false,paid:false,first:false},
+          {id:'r'+emp.id+'-2026-10-01',date:'2026-10-01',kind:'调薪',status:'当前生效',currency:emp.currency,reason:'单独调薪',note:'',items:{'基本工资':base,'固定津贴':1500,'交通津贴':800},locked:index===1,paid:false,first:false},
+          {id:'r'+emp.id+'-2025-10-01',date:'2025-10-01',kind:'调薪',status:'历史',currency:emp.currency,reason:'调级调薪/晋升调薪',note:'',items:{'基本工资':26000,'固定津贴':1500,'交通津贴':800},locked:false,paid:false,first:false},
+          {id:'r'+emp.id+'-2024-10-01',date:'2024-10-01',kind:'调薪',status:'历史',currency:emp.currency,reason:'晋升调薪',note:'',items:{'基本工资':24000,'固定津贴':1200,'交通津贴':700},locked:false,paid:false,first:false},
+          {id:'r'+emp.id+'-2023-10-01',date:'2023-10-01',kind:'定薪',status:'历史',currency:emp.currency,reason:'入职定薪',note:'',items:{'基本工资':22000,'固定津贴':1000,'交通津贴':600},locked:false,paid:false,first:true}
+        ];
+        if(index===1){defaultArchive[emp.id][1].locked=true;defaultArchive[emp.id][1].status='当前生效'}
+        if(index===0){defaultArchive[emp.id][0].locked=false;defaultArchive[emp.id][0].paid=false;defaultArchive[emp.id][0].snapshot=true;defaultArchive[emp.id][0].snapshotActivity='2026年12月薪资核算（草稿）'}
+      });
+      var initial={page:'groups',settingsOpen:true,groups:defaultGroups,items:defaultItems,subjectGroups:defaultSubjectGroups,periods:defaultPeriods,employees:employees,archive:defaultArchive,columns:['工号','姓名','雇佣记录编号','部门','岗位','薪资组','生效日期','币种','基本工资','定调调薪原因','定调调薪说明','创建人'],filters:{},filterVisibility:{},openFilter:'',openSelect:'',drawer:null,modal:null,formDraft:null,selectedEmployee:'EMP10001',selectedRecord:null,toast:null,archiveView:'all',pageSize:10,columnOptions:['工号','姓名','雇佣记录编号','部门','岗位','薪资组','生效日期','币种','定调调薪原因','定调调薪说明','创建人','创建时间','更新人','更新时间','基本工资','固定津贴','交通津贴','夜班津贴','其他薪资项'],year:'2026'};
+      var state=loadState();
+      var filterDefinitions={
+        groups:[['薪资组名称',['全部','泰国BNT总部薪资组方案','泰国BKK薪资组']],['适用国家',['全部','泰国','越南']],['币种',['全部','THB','VND','USD']],['授权范围',['全部','全部组织','自定义']],['状态'],['描述',['全部']],['创建人',['全部']],['创建时间',['全部','近7天','近30天']],['更新人',['全部']],['更新时间',['全部']]],
+        items:[['薪资项名称',['全部','基本工资','固定津贴','交通津贴']],['适用范围',['全部','全部薪资组','自定义']],['状态'],['描述',['全部']],['创建人',['全部']],['创建时间',['全部']],['更新人',['全部']],['更新时间',['全部']],['数据类型',['全部','数值','文本','日期'],false],['计量单位',['全部','月','半月','日','小时'],false]],
+        subjects:[['薪资组编码',['全部','TH_BKK','TH_BNT']],['适用组织',['全部','J&T集团','自定义']],['状态'],['描述',['全部']],['创建人',['全部']],['创建时间',['全部']],['更新人',['全部']],['更新时间',['全部']],['数据类型',['全部','数值','文本','日期'],false]],
+        periods:[['适用组织',['全部','全部组织','自定义']],['状态'],['描述',['全部']],['创建人',['全部']],['创建时间',['全部']],['更新人',['全部']],['更新时间',['全部']],['发薪周期',['全部','月薪','半月薪','周薪'],false]],
+        archives:[['工号/姓名',['全部','工号','姓名']],['部门',['全部','运营部-曼谷分拨']],['岗位',['全部','运营专员']],['薪资组',['全部','TH-BKK','TH-BNT']],['人员范围',['全部','在职','离职']],['主兼职',['全部','主岗','兼岗']],['生效日期',['全部','近30天']],['创建人',['全部']],['创建时间',['全部']],['更新人',['全部']],['更新时间',['全部']]]
+      };
+      function loadState(){try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw)return initial;var saved=JSON.parse(raw);return Object.assign({},initial,saved)}catch(e){return initial}}
+      function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({page:state.page,groups:state.groups,items:state.items,subjectGroups:state.subjectGroups,periods:state.periods,employees:state.employees,archive:state.archive,columns:state.columns,archiveView:state.archiveView,filterVisibility:state.filterVisibility}))}catch(e){}}
+      function esc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+      function uid(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6)}
+      function fmtNum(value){var n=Number(value||0);return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+      function textInput(label,path,value,required,placeholder,options){options=options||{};var count=options.count||'',readonly=options.readonly?' readonly':'',disabled=options.disabled?' disabled':'',max=options.max?' maxlength="'+options.max+'"':'';var action=options.multilang?'<button class="icon-button" data-action="multilang" data-field="'+esc(path)+'" title="多语言选择"><img src="assets/figma-icons/multilang.svg" alt=""></button>':'';return '<div class="field"><label class="field-label '+(required?'required':'')+'">'+esc(label)+(count?'<span class="counter" data-count="'+esc(path)+'">'+esc(String(value||'').length)+'/'+count+'</span>':'')+'</label><div class="input-with-action"><input class="control" data-bind="'+esc(path)+'" value="'+esc(value||'')+'" placeholder="'+esc(placeholder||'请输入')+'"'+readonly+disabled+max+'>'+action+'</div></div>'}
+      function selectControl(id,value,choices,config){config=config||{};var selectId=String(id),multiple=!!config.multiple,placeholder=config.placeholder||'请选择',normalized=choices.map(function(c){var v=typeof c==='string'?c:c.value;var t=typeof c==='string'?c:c.label;return {value:String(v),label:String(t)}}),values=multiple?(Array.isArray(value)?value.map(function(v){return String(v)}):[]):[String(value==null?'':value)],selectedLabels=normalized.filter(function(o){return values.indexOf(o.value)>=0}).map(function(o){return o.label}),display=multiple?(selectedLabels.join('、')||placeholder):(selectedLabels[0]||placeholder),open=state.openSelect===selectId,disabled=!!config.disabled,attrs=' data-select-id="'+esc(selectId)+'" data-select-bind="'+esc(config.bind||'')+'" data-select-kind="'+esc(config.kind||'')+'" data-select-multiple="'+multiple+'"',menu=normalized.map(function(o){var checked=values.indexOf(o.value)>=0,optionAttrs=' type="button" role="option" data-action="select-option"'+attrs+' data-select-value="'+esc(o.value)+'" aria-selected="'+checked+'"';if(multiple)return '<button class="filter-option '+(checked?'checked':'')+'"'+optionAttrs+'><span class="filter-check">'+(checked?'✓':'')+'</span><span>'+esc(o.label)+'</span></button>';return '<button class="select-option '+(checked?'selected':'')+'"'+optionAttrs+'><span class="select-option-label">'+esc(o.label)+'</span><span class="select-option-check" aria-hidden="true">'+(checked?'✓':'')+'</span></button>'}).join(''),button='<button type="button" class="select-trigger '+(open?'open ':'')+(selectedLabels.length?'has-value':'')+'" data-action="toggle-select" data-select-id="'+esc(selectId)+'" aria-haspopup="listbox" aria-expanded="'+open+'"'+(disabled?' disabled':'')+'><span class="select-value">'+esc(display)+'</span><img class="select-arrow" src="assets/figma-icons/select-arrow.svg" alt=""></button>';return '<div class="select-wrap '+(config.className||'')+(multiple?' multiple-select':'')+'">'+button+(open&&!disabled?'<div class="filter-menu select-menu" role="listbox">'+menu+'</div>':'')+'</div>'}function selectInput(label,path,value,choices,required,disabled){return '<div class="field"><label class="field-label '+(required?'required':'')+'">'+esc(label)+'</label>'+selectControl(path,value,choices,{bind:path,disabled:disabled,className:'form-select'})+'</div>'}function textArea(label,path,value,placeholder){return '<div class="field"><label class="field-label">'+esc(label)+'</label><textarea class="textarea" data-bind="'+esc(path)+'" placeholder="'+esc(placeholder||'请输入')+'">'+esc(value||'')+'</textarea></div>'}
+      function radioGroup(label,path,value,choices,required,disabled){var items=choices.map(function(c){return '<label><input type="radio" name="'+esc(path)+'" data-bind="'+esc(path)+'" value="'+esc(c.value)+'" '+(value===c.value?'checked':'')+(disabled?' disabled':'')+'><span>'+esc(c.label)+'</span></label>'}).join('');return '<div class="field"><label class="field-label '+(required?'required':'')+'">'+esc(label)+'</label><div class="radio-line '+(disabled?'readonly':'')+'">'+items+'</div></div>'}
+      function pillList(path,items,interactive){var selected=items||[],tags=selected.map(function(t,i){return '<span class="multi-pill"><span>'+esc(t)+'</span>'+(interactive?'<button data-action="remove-org" data-index="'+i+'" data-path="'+esc(path)+'">×</button>':'')+'</span>'}).join(''),placeholder=selected.length?'':'<span class="multi-placeholder">请选择</span>';return '<div class="multi-select" data-action="open-org" data-field="'+esc(path)+'">'+tags+placeholder+'<span class="multi-spacer"></span><img class="select-arrow" src="assets/figma-icons/select-arrow.svg" alt=""></div>'}
+      function status(value){return '<span class="status '+(value==='启用'?'':'off')+'">'+esc(value)+'</span>'}
+      function rowAction(action,label,id){return '<button class="link-red" data-action="'+action+'" data-id="'+esc(id)+'">'+label+'</button>'}
+      function isProtectedSubject(item){return !!(item&&item.system&&state.subjectGroups.some(function(g){return g.items.length&&g.items[0].id===item.id}))}
+      function subjectToggleAction(item){if(isProtectedSubject(item)&&item.status==='启用')return '<span class="tip-pill subject-disabled-action" aria-disabled="true">停用<span class="tooltip">系统预置项不可停用</span></span>';return rowAction('toggle-subject',item.status==='启用'?'停用':'启用',item.id)}
+      function pagination(total){var p=state.filters.page||3;return '<div class="pagination">'+selectControl('__page-size',String(state.pageSize||10),[{value:'10',label:'10条/页'},{value:'20',label:'20条/页'}],{kind:'page-size',className:'page-size-select'})+'<span>‹</span><button class="page-num">1</button><button class="page-num">2</button><button class="page-num current">'+p+'</button><button class="page-num">4</button><button class="page-num">5</button><span>…</span><button class="page-num">80</button><span>›</span><span>前往</span><input class="page-go"><span>页</span><span style="margin-left:16px">共'+total+'条记录</span></div>'}
+      function filterValues(label){var selected=state.filters[label];if(!selected||selected==='全部')return [];return Array.isArray(selected)?selected:[selected]}
+      function filterChip(label,options){var open=state.openFilter===label;var opts=options||['全部','启用','停用'];var selected=filterValues(label);var hasSelection=selected.length>0;var labelText=hasSelection?label+'：'+selected.join('、'):label;var caret='<span class="caret"><img class="state-default" src="assets/figma-icons/filter-caret.svg" alt=""><img class="state-active" src="assets/figma-icons/filter-caret-active.svg" alt=""></span>';var tail=hasSelection?caret+'<span class="filter-clear selected-clear" data-action="clear-filter" data-filter="'+esc(label)+'" title="清除筛选"><img src="assets/figma-icons/filter-selection-clear.svg" alt=""></span>':caret+'<span class="filter-sep"></span><span class="filter-clear" data-action="clear-filter" data-filter="'+esc(label)+'" title="清除筛选"><img class="state-default" src="assets/figma-icons/filter-clear.svg" alt=""><img class="state-active" src="assets/figma-icons/filter-clear-active.svg" alt=""></span>';var menu=opts.map(function(o){var checked=o==='全部'?!hasSelection:selected.indexOf(o)>=0;return '<button class="filter-option '+(checked?'checked':'')+'" data-action="filter-select" data-filter="'+esc(label)+'" data-value="'+esc(o)+'" aria-pressed="'+checked+'"><span class="filter-check">'+(checked?'✓':'')+'</span><span>'+esc(o)+'</span></button>'}).join('');return '<div class="filter-wrap"><button class="filter-chip '+(open?'open ':'')+(hasSelection?'has-selection':'')+'" data-action="toggle-filter" data-filter="'+esc(label)+'" aria-expanded="'+open+'"><span class="filter-label">'+esc(labelText)+'</span>'+tail+'</button>'+(open?'<div class="filter-menu">'+menu+'</div>':'')+'</div>'}
+      function filterPageKey(page){var key=page||state.page;return key==='unpriced'?'archives':key}
+      function isFilterVisible(page,definition){var key=filterPageKey(page),selected=state.filterVisibility&&state.filterVisibility[key];if(!Array.isArray(selected))return definition[2]!==false;return selected.indexOf(definition[0])>=0}
+      function renderFilterToolbar(page){var key=filterPageKey(page),definitions=filterDefinitions[key]||[],chips=definitions.filter(function(d){return isFilterVisible(key,d)}).map(function(d){return filterChip(d[0],d[1])}).join(''),open=state.openFilter==='__more__';var menu=definitions.map(function(d){var checked=isFilterVisible(key,d);return '<button type="button" class="filter-option more-filter-option '+(checked?'checked':'')+'" data-action="toggle-filter-visibility" data-filter-field="'+esc(d[0])+'" aria-pressed="'+checked+'"><span class="filter-check">'+(checked?'✓':'')+'</span><span>'+esc(d[0])+'</span></button>'}).join('');var more='<div class="filter-wrap more-filter-wrap"><button class="filter-chip more-filter-chip '+(open?'open':'')+'" data-action="toggle-filter" data-filter="__more__" aria-expanded="'+open+'"><span class="filter-label">更多</span><span class="caret"><img class="state-default" src="assets/figma-icons/filter-caret.svg" alt=""><img class="state-active" src="assets/figma-icons/filter-caret-active.svg" alt=""></span></button>'+(open?'<div class="filter-menu more-filter-menu">'+menu+'</div>':'')+'</div>';return chips+'<div class="toolbar-query-actions">'+more+'<button class="btn primary" data-action="search">查询</button></div>'}
+      function filterRows(rows,fields){return rows.filter(function(row){return Object.keys(fields).every(function(key){var selected=filterValues(key);if(!selected.length)return true;var value=fields[key](row);return Array.isArray(value)?selected.some(function(item){return value.indexOf(item)>=0}):selected.indexOf(value)>=0})})}
+      function renderTopbar(){return '<header class="topbar"><div class="brand"><span class="brand-mark">J&amp;T</span><span class="brand-home">Home</span></div><nav class="topnav"><span class="topnav-item" title="首页">⌂</span><span class="topnav-item active">人资</span><span class="topnav-item">财务</span><span class="topnav-item">资产</span><span class="topnav-item">兔迹</span><span class="topnav-item">OA</span></nav><div class="topnav-right"><button class="top-action"><span class="mini">◉</span>浏览器打开</button><button class="top-action"><span class="mini">▣</span>任务中心</button><button class="top-action"><span class="mini">⇥</span>退出</button></div></header>'}
+      function renderSidebar(){var current=state.page;var archives=['archives','unpriced'].indexOf(current)>=0;var settings=['groups','subjects','items','periods'].indexOf(current)>=0;var archiveIcon=archives?'sidebar-archive-active.svg':'sidebar-archive.svg';var settingsIcon=settings?'sidebar-settings-active.svg':'sidebar-settings.svg';var archiveChevron=archives?'sidebar-chevron-expanded.svg':'sidebar-chevron-collapsed.svg';var settingsChevron=state.settingsOpen?'sidebar-chevron-expanded.svg':'sidebar-chevron-collapsed.svg';return '<aside class="sidebar"><button class="nav-row '+(archives?'active':'')+'" data-action="nav" data-page="archives"><span class="nav-ico"><img src="assets/figma-icons/'+archiveIcon+'" alt=""></span><span>薪资档案</span><span class="nav-chevron '+(archives?'open':'')+'"><img src="assets/figma-icons/'+archiveChevron+'" alt=""></span></button>'+(archives?'<div class="subnav"><button class="active" data-action="nav" data-page="archives">员工薪资档案</button></div>':'')+'<button class="nav-row '+(settings?'active':'')+'" data-action="toggle-settings"><span class="nav-ico"><img src="assets/figma-icons/'+settingsIcon+'" alt=""></span><span>设置</span><span class="nav-chevron '+(state.settingsOpen?'open':'')+'"><img src="assets/figma-icons/'+settingsChevron+'" alt=""></span></button>'+(state.settingsOpen?'<div class="subnav"><button class="'+(current==='groups'?'active':'')+'" data-action="nav" data-page="groups">薪资组</button><button class="'+(current==='items'?'active':'')+'" data-action="nav" data-page="items">薪资项</button><button class="'+(current==='subjects'?'active':'')+'" data-action="nav" data-page="subjects">薪资科目</button><button class="'+(current==='periods'?'active':'')+'" data-action="nav" data-page="periods">期间规则</button></div>':'')+'</aside>'}
+      function renderTitle(text,actions){return '<div class="section-title"><span>'+esc(text)+'</span><div class="section-actions">'+(actions||'')+'</div></div>'}
+      function renderGroupPage(){var rows=state.groups.slice();var query=(state.filters.groupSearch||'').trim().toLowerCase();if(query)rows=rows.filter(function(g){return (g.code+g.name+g.country+g.currency).toLowerCase().indexOf(query)>=0});rows=filterRows(rows,{'薪资组名称':function(g){return g.name},'适用国家':function(g){return g.country},'币种':function(g){return g.currency},'授权范围':function(g){return g.scope==='all'?'全部组织':'自定义'},'状态':function(g){return g.status}});return '<div class="page-content"><div class="toolbar"><div class="searchbox"><input placeholder="请输入薪资组编码" data-search="groupSearch" value="'+esc(state.filters.groupSearch||'')+'"><span class="search-ico"><img src="assets/figma-icons/search.svg" alt=""></span></div>'+renderFilterToolbar('groups')+'</div>'+renderTitle('搜索结果','<button class="btn" data-action="new-group">新增</button>')+'<div class="table-wrap"><table><thead><tr><th>薪资组编码</th><th>薪资组名称</th><th>适用国家</th><th>币种</th><th>授权范围</th><th>状态</th><th>描述</th><th>创建人</th><th>创建时间</th><th>更新人</th><th>更新时间</th><th>操作</th></tr></thead><tbody>'+rows.map(function(g){return '<tr><td>'+esc(g.code)+'</td><td style="color:var(--brand)"><span class="ellipsis">'+esc(g.name)+'</span></td><td>'+esc(g.country)+'</td><td>'+esc(g.currency)+'</td><td><span class="ellipsis">'+esc(g.scope==='all'?'全部组织':(g.orgs||[]).join('、'))+'</span></td><td>'+status(g.status)+'</td><td><span class="ellipsis">'+esc(g.desc)+'</span></td><td>'+esc(g.creator||'张舒')+'</td><td>'+esc(g.created||'2026-11-05 19:42:44')+'</td><td>'+esc(g.creator||'张舒')+'</td><td>'+esc(g.created||'2026-11-05 19:42:44')+'</td><td>'+rowAction('edit-group','编辑',g.id)+rowAction('toggle-group',g.status==='启用'?'停用':'启用',g.id)+'</td></tr>'}).join('')+'</tbody></table></div>'+pagination(400)+'</div>'}
+      function renderItemPage(){var rows=state.items.slice().sort(function(a,b){return Number(a.seq)-Number(b.seq)});var q=(state.filters.itemSearch||'').toLowerCase();if(q)rows=rows.filter(function(i){return (i.code+i.name).toLowerCase().indexOf(q)>=0});rows=filterRows(rows,{'薪资项名称':function(i){return i.name},'适用范围':function(i){return i.scope},'状态':function(i){return i.status},'数据类型':function(i){return i.type},'计量单位':function(i){return i.unit}});return '<div class="page-content"><div class="toolbar"><div class="searchbox"><input placeholder="请输入薪资项编码" data-search="itemSearch" value="'+esc(state.filters.itemSearch||'')+'"><span class="search-ico"><img src="assets/figma-icons/search.svg" alt=""></span></div>'+renderFilterToolbar('items')+'</div>'+renderTitle('搜索结果','<button class="btn" data-action="new-item">新增</button>')+'<div class="table-wrap"><table><thead><tr><th>序号</th><th>薪资项编码</th><th>薪资项名称</th><th>数据类型</th><th>计量单位</th><th>适用范围</th><th>状态</th><th>描述</th><th>创建人</th><th>创建时间</th><th>操作</th></tr></thead><tbody>'+rows.map(function(i){return '<tr><td>'+esc(i.seq)+'</td><td>'+esc(i.code)+'</td><td>'+esc(i.name)+(i.seq===10?'<span class="system-badge">系统</span>':'')+'</td><td>'+esc(i.type)+'</td><td>'+esc(i.unit||'—')+'</td><td><span class="ellipsis">'+esc(i.scope||'全部薪资组')+'</span></td><td>'+status(i.status)+'</td><td><span class="ellipsis">'+esc(i.desc)+'</span></td><td>'+esc(i.creator||'张舒')+'</td><td>2026-11-05 19:42:44</td><td>'+rowAction('edit-item','编辑',i.id)+rowAction('toggle-item',i.status==='启用'?'停用':'启用',i.id)+'</td></tr>'}).join('')+'</tbody></table></div>'+pagination(400)+'</div>'}
+      function renderSubjectPage(){var flat=[];var query=(state.filters.subjectSearch||'').toLowerCase();var subjectGroups=state.subjectGroups.map(function(g){var matched=g.items.filter(function(i){if(query&&(i.code+i.name+i.desc).toLowerCase().indexOf(query)<0)return false;var statusValues=filterValues('状态');if(statusValues.length&&statusValues.indexOf(i.status)<0)return false;var scopeValues=filterValues('适用组织');if(scopeValues.length){var value=i.scope==='全部组织'?'J&T集团':'自定义';if(scopeValues.indexOf(value)<0)return false}var typeValues=filterValues('数据类型');if(typeValues.length&&typeValues.indexOf(i.type)<0)return false;return true});return Object.assign({},g,{items:matched})});subjectGroups.forEach(function(g,groupIndex){var stripe=groupIndex%2?'stripe-gray':'stripe-white';flat.push('<tr class="group-head '+stripe+(g.expanded?' expanded':'')+'"><td colspan="11"><span class="group-name"><button class="group-expand" data-action="toggle-subject-group" data-id="'+esc(g.id)+'">'+(g.expanded?'<img src="assets/figma-icons/group-expanded.svg" alt="">':'<img src="assets/figma-icons/group-collapsed.svg" alt="">')+'</button>'+esc(g.name)+'<span class="group-count">'+g.items.length+'项</span><button class="group-control" data-action="rename-subject-group" data-id="'+esc(g.id)+'" title="编辑"><img src="assets/figma-icons/group-edit.svg" alt=""></button><button class="group-control" data-action="delete-subject-group" data-id="'+esc(g.id)+'" title="删除"><img src="assets/figma-icons/group-delete.svg" alt=""></button></span></td></tr>');if(g.expanded)g.items.forEach(function(i){flat.push('<tr class="group-member '+stripe+'"><td>'+esc(i.code)+'</td><td>'+esc(i.name)+(i.system?'<span class="system-badge">系统</span>':'')+'</td><td><span class="ellipsis">'+esc(i.scope||'全部组织')+'</span></td><td>'+esc(i.type)+'</td><td>'+status(i.status)+'</td><td>'+esc(i.desc||'—')+'</td><td>'+esc(i.creator||'张舒')+'</td><td>2026-11-05 19:42:44</td><td>'+esc(i.creator||'张舒')+'</td><td>2026-11-05 19:42:44</td><td>'+rowAction('edit-subject','编辑',i.id)+subjectToggleAction(i)+'</td></tr>')})});return '<div class="page-content"><div class="toolbar"><div class="searchbox"><input placeholder="请输入薪资科目名称" data-search="subjectSearch" value="'+esc(state.filters.subjectSearch||'')+'"><span class="search-ico"><img src="assets/figma-icons/search.svg" alt=""></span></div>'+renderFilterToolbar('subjects')+'</div>'+renderTitle('搜索结果','<button class="btn" data-action="new-subject-group">新建分组</button><span class="section-actions-divider" aria-hidden="true"></span><button class="btn" data-action="batch-subject">批量新增</button><button class="btn" data-action="new-subject">新增</button>')+'<div class="table-wrap"><table class="subject-table"><thead><tr><th>薪资科目编码</th><th>薪资科目名称</th><th>授权范围</th><th>数据类型</th><th>状态</th><th>描述</th><th>创建人</th><th>创建时间</th><th>更新人</th><th>更新时间</th><th>操作</th></tr></thead><tbody>'+flat.join('')+'</tbody></table></div>'+pagination(400)+'</div>'}
+      function renderPeriodPage(){var rows=state.periods.slice();var q=(state.filters.periodSearch||'').toLowerCase();if(q)rows=rows.filter(function(p){return (p.name+p.cycle+p.scope).toLowerCase().indexOf(q)>=0});rows=filterRows(rows,{'适用组织':function(p){return p.scope==='全部组织'?'全部组织':'自定义'},'状态':function(p){return p.status},'发薪周期':function(p){return p.cycle}});return '<div class="page-content"><div class="toolbar"><div class="searchbox"><input placeholder="请输入期间规则名称" data-search="periodSearch" value="'+esc(state.filters.periodSearch||'')+'"><span class="search-ico"><img src="assets/figma-icons/search.svg" alt=""></span></div>'+renderFilterToolbar('periods')+'</div>'+renderTitle('搜索结果','<button class="btn" data-action="new-period">新增</button>')+'<div class="table-wrap"><table><thead><tr><th>期间规则名称</th><th>授权范围</th><th>币种</th><th>发薪周期</th><th>首个期间生成时间</th><th>状态</th><th>描述</th><th>创建人</th><th>创建时间</th><th>更新人</th><th>更新时间</th><th>操作</th></tr></thead><tbody>'+rows.map(function(p){return '<tr><td>'+(p.cycle==='周薪'?'<button class="link-red" data-action="view-weekly" data-id="'+esc(p.id)+'">'+esc(p.name)+'</button>':esc(p.name))+'</td><td><span class="ellipsis">'+esc(p.scope)+'</span></td><td>'+esc(p.currency||'THB')+'</td><td>'+esc(p.cycle)+'</td><td>'+esc(p.first||'—')+'</td><td>'+status(p.status)+'</td><td>'+esc(p.desc)+'</td><td>'+esc(p.creator)+'</td><td>2026-11-05 19:42:44</td><td>'+esc(p.creator)+'</td><td>2026-11-05 19:42:44</td><td>'+rowAction('edit-period','编辑',p.id)+rowAction('toggle-period',p.status==='启用'?'停用':'启用',p.id)+'</td></tr>'}).join('')+'</tbody></table></div>'+pagination(400)+'</div>'}
+      function archiveHeaders(){var cols=state.columns||initial.columns;return cols.map(function(c){return '<th>'+esc(c)+'</th>'}).join('')+'<th>操作</th><th><button class="table-gear" data-action="column-settings" title="列设置"><img src="assets/figma-icons/table-settings.svg" alt=""></button></th>'}
+      function archiveValue(emp,c){var rec=(state.archive[emp.id]||[]).filter(function(r){return r.status==='当前生效'||r.status==='待生效'}).sort(function(a,b){return b.date.localeCompare(a.date)})[0];if(c==='工号')return emp.no;if(c==='姓名')return emp.name;if(c==='雇佣记录编号')return emp.id;if(c==='部门')return emp.dept;if(c==='岗位')return emp.job;if(c==='薪资组')return emp.group;if(c==='生效日期')return rec?rec.date:emp.date;if(c==='币种')return emp.currency;if(c==='定调调薪原因')return rec?rec.reason:'—';if(c==='定调调薪说明')return rec?rec.note||'—':'—';if(c==='创建人'||c==='更新人')return '张舒';if(c==='创建时间'||c==='更新时间')return '2026-11-05 19:42:44';if(c==='基本工资')return rec?fmtNum(rec.items['基本工资']):'28,000.00';if(c==='固定津贴')return rec?fmtNum(rec.items['固定津贴']):'1,500.00';if(c==='交通津贴')return rec?fmtNum(rec.items['交通津贴']):'800.00';return '—'}
+      function renderArchivePage(){var emps=state.employees.filter(function(e){return state.archiveView==='unpriced'?e.needSalary:!e.needSalary});var q=(state.filters.archiveSearch||'').toLowerCase();if(q)emps=emps.filter(function(e){return (e.id+e.no+e.name+e.dept+e.job).toLowerCase().indexOf(q)>=0});emps=filterRows(emps,{'部门':function(e){return e.dept},'岗位':function(e){return e.job},'薪资组':function(e){return e.group},'人员范围':function(){return '在职'},'主兼职':function(){return '主岗'},'生效日期':function(e){var records=state.archive[e.id]||[];var record=records.filter(function(r){return r.status==='当前生效'||r.status==='待生效'}).sort(function(a,b){return b.date.localeCompare(a.date)})[0];var date=new Date((record?record.date:e.date)+'T00:00:00');var base=new Date('2026-11-23T00:00:00');return Math.abs(date-base)<=30*86400000?'近30天':'其他'}});var unpricedCount=state.employees.filter(function(e){return e.needSalary}).length;var cols=state.columns||initial.columns;var header=state.archiveView==='unpriced'?['工号','姓名','部门','岗位','薪资组','入职日期']:cols;var top=state.archiveView==='unpriced'?'<div class="back-row"><button class="back-button" data-action="back-archive">← 返回</button></div>':(unpricedCount?'<div class="warning-banner"><span class="warning-icon">!</span>有 <strong>'+unpricedCount+'</strong> 名在职员工尚未建立薪资档案，不在本列表中 <button data-action="show-unpriced">去处理&gt;</button></div>':'');var filter='<div class="toolbar"><div class="searchbox"><input placeholder="请输入雇佣记录编号" data-search="archiveSearch" value="'+esc(state.filters.archiveSearch||'')+'"><span class="search-ico"><img src="assets/figma-icons/search.svg" alt=""></span></div>'+renderFilterToolbar('archives')+'</div>';var rows=emps.map(function(e){return '<tr>'+header.map(function(c){return '<td>'+esc(archiveValue(e,c))+'</td>'}).join('')+'<td>'+ (state.archiveView==='unpriced'?'<button class="link-red" data-action="set-salary" data-id="'+esc(e.id)+'">定薪</button>':'<button class="link-red" data-action="adjust-salary" data-id="'+esc(e.id)+'">调薪</button><button class="link-red" data-action="view-archive" data-id="'+esc(e.id)+'">查看薪资档案</button>')+'</td><td></td></tr>'}).join('');var batch=state.archiveView==='all'?'<button class="btn" data-action="batch-import">批量导入</button>':'';return '<div class="page-content">'+top+filter+renderTitle('搜索结果',batch)+'<div class="table-wrap"><table><thead><tr>'+header.map(function(c){return '<th>'+esc(c)+'</th>'}).join('')+'<th>操作</th><th><button class="table-gear" data-action="column-settings" title="列设置"><img src="assets/figma-icons/table-settings.svg" alt=""></button></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+pagination(state.archiveView==='unpriced'?unpricedCount:400)+'</div>'}
+      function isoWeekNumber(date){var d=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()));d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));var yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-yearStart)/86400000)+1)/7)}
+      function isoWeeksInYear(year){return isoWeekNumber(new Date(Date.UTC(year,11,28)))}
+      function isoWeekRange(year,week){var jan4=new Date(Date.UTC(year,0,4));var monday=new Date(jan4);monday.setUTCDate(jan4.getUTCDate()-((jan4.getUTCDay()+6)%7)+(week-1)*7);var sunday=new Date(monday);sunday.setUTCDate(monday.getUTCDate()+6);function fmt(d){return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0')}return fmt(monday)+' 至 '+fmt(sunday)}
+      function renderWeeklyDetail(){
+        var p=state.periods.find(function(x){return x.id===state.selectedPeriod})||state.periods.filter(function(x){return x.cycle==='周薪'})[0]||initial.periods[6];
+        var year=Number(state.year)||2026;
+        var totalWeeks=isoWeeksInYear(year);
+        var weekRows=[];
+        for(var i=0;i<4;i++){
+          var week=totalWeeks-i;
+          var rowYear=year;
+          if(week<1){rowYear--;week=isoWeeksInYear(rowYear)+week}
+          var range=isoWeekRange(rowYear,week);
+          weekRows.push('<tr><td>'+rowYear+'年 第'+week+'周</td><td>'+range+'</td><td>'+range+'</td></tr>');
+        }
+        var yearOptions=[2026,2025,2024].map(function(y){return {value:String(y),label:y+'年'}});
+        var cycle=p.cycle==='周薪'?'周':(p.cycle||'周');
+        var firstDate=p.first||'2020-10-12';
+        var scope=p.detailScope||(p.id==='p7'?'越南-快递中心':p.scope);
+        return '<div class="weekly-detail-stack">'+
+          '<section class="weekly-summary-card"><div class="weekly-summary-copy"><div class="weekly-title-row"><span class="weekly-title">'+esc(p.name)+'</span><span class="weekly-meta-badge"><span class="weekly-meta-icon"><img src="assets/figma-icons/salary.svg" alt=""></span>发薪周期：'+esc(cycle)+'</span><span class="weekly-meta-badge"><span class="weekly-meta-icon"><img src="assets/figma-icons/date.svg" alt=""></span>首个期间生成日期：'+esc(firstDate)+'</span></div><div class="weekly-summary-org">适用组织：'+esc(scope||'—')+'</div></div></section>'+ 
+          '<section class="weekly-table-card"><div class="weekly-card-header"><div class="weekly-card-title">期间明细</div>'+selectControl('__year',String(year),yearOptions,{kind:'year',className:'weekly-year-select'})+'</div><div class="weekly-table-content"><div class="weekly-table-wrap"><table class="weekly-table"><thead><tr><th>期间</th><th>算薪起止</th><th>考勤起止</th></tr></thead><tbody>'+weekRows.join('')+'</tbody></table></div>'+pagination(400)+'</div></section>'+
+        '</div>';
+      }
+      function renderPage(){if(state.page==='groups')return renderGroupPage();if(state.page==='items')return renderItemPage();if(state.page==='subjects')return renderSubjectPage();if(state.page==='periods')return renderPeriodPage();if(state.page==='archives')return renderArchivePage();if(state.page==='unpriced')return renderArchivePage();if(state.page==='weekly')return renderWeeklyDetail();return renderGroupPage()}
+      function renderApp(){
+        var content=state.page==='weekly'?'<main class="weekly-page">'+renderWeeklyDetail()+'</main>':'<div class="layout">'+renderSidebar()+'<main class="workspace">'+renderPage()+'</main></div>';
+        document.getElementById('app').innerHTML=renderTopbar()+content+(state.drawer?renderDrawer(): '')+(state.modal?renderModal(): '')+(state.toast?'<div class="toast '+(state.toast.error?'error':'')+'">'+esc(state.toast.text)+'</div>':'');
+      }
+
+      function drawerFrame(title,content,wide,footer,modifier){
+        var drawerClass='drawer '+(wide?'wide-form':'')+' '+(wide==='detail'?'wide':'')+(modifier?' '+modifier:'');
+        return '<div class="overlay" data-action="overlay-close"><section class="'+drawerClass+'" onclick="event.stopPropagation()"><div class="drawer-header">'+esc(title)+'<button class="drawer-close" data-action="close-drawer" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="drawer-body">'+content+'</div>'+(footer===false?'':'<div class="drawer-footer"><button class="btn" data-action="cancel-drawer">取消</button><button class="btn primary" data-action="save-drawer">保存</button></div>')+'</section></div>'
+      }
+      function personCard(emp){return '<div class="subsection-title">基本信息</div><div class="profile-card"><div class="profile-cell"><label>雇佣记录编号</label><strong>'+esc(emp.id)+'</strong></div><div class="profile-cell"><label>姓名</label><strong>'+esc(emp.name)+'</strong></div><div class="profile-cell"><label>工号</label><strong>'+esc(emp.no)+'</strong></div><div class="profile-cell"><label>薪资组</label><strong>'+esc(emp.group)+'</strong></div><div class="profile-cell"><label>部门</label><strong>'+esc(emp.dept)+'</strong></div><div class="profile-cell"><label>岗位</label><strong>'+esc(emp.job)+' <span class="tag">主岗</span> <span class="tag orange">兼职</span></strong></div><div class="profile-cell"><label>需求状态</label><strong><span class="status">在职</span></strong></div></div>'}
+      function renderGroupDrawer(){var d=state.formDraft||{};var orgs=d.orgs||[];var content=textInput('薪资组编码','code',d.code,true,'仅支持大写字母、数字与“_”，创建后不可修改',{count:40,readonly:!!d.id})+textInput('薪资组名称','name',d.name,true,'请输入',{count:50,multilang:true})+selectInput('适用国家','country',d.country||'泰国',['泰国','越南','中国','马来西亚'],true,!!d.id)+selectInput('币种','currency',d.currency||'THB',['THB','VND','CNY','MYR','USD'],true,!!d.id)+radioGroup('授权范围','scope',d.scope||'all',[{value:'all',label:'全部'},{value:'custom',label:'自定义'}],true)+(d.scope==='custom'?'<div class="field"><label class="field-label required">授权组织</label>'+pillList('orgs',orgs,true)+'</div>':'')+textArea('描述','desc',d.desc,'请输入');return drawerFrame(d.id?'编辑':'新增',content,false)}
+      function renderSubjectGroupModal(){var d=state.formDraft||{};return '<div class="modal-layer" data-action="overlay-close"><section class="modal" onclick="event.stopPropagation()"><div class="modal-header">'+(d.id?'编辑分组':'新建分组')+'<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body">'+textInput('分组名称','name',d.name,true,'请输入',{count:20,multilang:true})+'</div><div class="modal-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="save-drawer">确定</button></div></section></div>'}
+      function renderSubjectDrawer(){var d=state.formDraft||{};var typeChoices=[{value:'文本',label:'文本'},{value:'数值',label:'数字'},{value:'百分比',label:'百分比'},{value:'日期',label:'日期'}];var groups=state.subjectGroups.map(function(g){return {value:g.id,label:g.name}});var content='<div class="subject-code-fields">'+textInput('薪资科目编码','code',d.code,true,'请输入',{count:40,readonly:!!d.system})+textInput('薪资科目名称','name',d.name,true,'请输入',{count:50,multilang:true})+'</div>'+radioGroup('授权范围','scope',d.scope||'all',[{value:'all',label:'全部'},{value:'custom',label:'自定义'}],true)+(d.scope==='custom'?'<div class="field"><label class="field-label required">授权组织</label>'+pillList('orgs',d.orgs||[],true)+'</div>':'')+selectInput('薪资科目分组','groupId',d.groupId||groups[0].value,groups,true,false)+radioGroup('字段类型','type',d.type||'文本',typeChoices,true,!!d.id)+(d.type==='数值'?'<div class="selection-panel"><div class="range-row"><span class="range-label">计量单位</span>'+selectControl('unit',d.unit||'元',['元','月','小时','天'],{bind:'unit',className:'range-unit'})+'</div></div>':'')+textArea('描述','desc',d.desc,'请输入');return drawerFrame(d.id?'编辑':'新增','<div class="subject-form-fields">'+content+'</div>',true)}
+      function renderItemDrawer(){var d=state.formDraft||{};var typeChoices=[{value:'文本',label:'文本'},{value:'数值',label:'数值'}];var sequence='<div class="field item-sequence-field"><label class="field-label required">序号</label><input class="control" type="number" min="1" step="1" inputmode="numeric" data-bind="seq" value="'+esc(d.seq==null?'':d.seq)+'" placeholder="请输入正整数"></div>';var content='<div class="field-grid">'+textInput('薪资项编码','code',d.code,true,'请输入')+textInput('默认名称','name',d.name,true,'请输入',{count:50,multilang:true})+'</div>'+sequence+radioGroup('数据类型','type',d.type||'数值',typeChoices,true)+(d.type==='数值'?'<div class="selection-panel"><div class="range-row"><span class="range-label">计量单位</span>'+selectControl('unit',d.unit||'月',['月','半月','周','日','小时'],{bind:'unit',className:'range-unit'})+'</div></div>':'')+radioGroup('适用范围','scopeValue',d.scopeValue||'custom',[{value:'all',label:'全部'},{value:'custom',label:'自定义'}],true)+(d.scopeValue==='custom'?'<div class="field"><label class="field-label required">适用范围</label>'+pillList('scopeItems',d.scopeItems||['TH-BKK','TH-CNK','TH-FACT','VN-SGN'],true)+'</div>':'')+textArea('描述','desc',d.desc,'请输入');return drawerFrame(d.id?'编辑':'新增',content,true)}
+      function monthDaySelect(path,selected,limit){var current=String(selected==null?1:selected);if(current.indexOf('日')<0)current+='日';var items=[];for(var n=1;n<=limit;n++)items.push({value:n+'日',label:n+'日'});return selectControl(path,current,items,{bind:path,className:'range-day'})}function monthSelect(path,value){return selectControl(path,value,['本月','上月','次月'],{bind:path,className:'range-month'})}function monthRange(prefix,label,startMonth,startDay,endMonth,endDay){return '<div class="range-row">'+(label?'<span class="range-label">'+esc(label)+'</span>':'')+monthSelect(prefix+'StartMonth',startMonth)+' '+monthDaySelect(prefix+'StartDay',startDay,31)+'<span>至</span>'+monthSelect(prefix+'EndMonth',endMonth)+' '+monthDaySelect(prefix+'EndDay',endDay,31)+'</div>'}
+      function addDateDays(value,days){if(!value)return '';var parts=value.split('-');if(parts.length!==3)return '';var date=new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2]));if(Number.isNaN(date.getTime()))return '';date.setDate(date.getDate()+days);return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0')}
+      function weekRange(prefix,start){var startDate=start||'2026-12-07';var endDate=addDateDays(startDate,6);return '<div class="range-row"><input class="week-start-control" type="date" data-bind="'+prefix+'Start" value="'+esc(startDate)+'"><span>至</span><input class="week-end-control" type="date" data-bind="'+prefix+'End" value="'+esc(endDate)+'" disabled aria-label="自动计算的结束日期"><span class="range-caption">（自动+7天）</span></div>'}
+      function renderPeriodDrawer(){var d=state.formDraft||{};var cycle=d.cycle||'月薪';var attendance=d.attendance||'same';var scope=d.scope||'custom';var salaryRanges=cycle==='月薪'?monthRange('salary','',d.salaryStartMonth||'本月',d.salaryStartDay||1,d.salaryEndMonth||'本月',d.salaryEndDay||31):cycle==='半月薪'?monthRange('half1','上半月',d.half1StartMonth||'本月',d.half1StartDay||1,d.half1EndMonth||'本月',d.half1EndDay||15)+monthRange('half2','下半月',d.half2StartMonth||'本月',d.half2StartDay||16,d.half2EndMonth||'本月',d.half2EndDay||31):weekRange('salaryWeek',d.salaryWeekStart);var attendanceRanges=cycle==='月薪'?monthRange('att','',d.attStartMonth||'本月',d.attStartDay||1,d.attEndMonth||'本月',d.attEndDay||31):cycle==='半月薪'?monthRange('attHalf1','上半月',d.attHalf1StartMonth||'本月',d.attHalf1StartDay||27,d.attHalf1EndMonth||'下月',d.attHalf1EndDay||11)+monthRange('attHalf2','下半月',d.attHalf2StartMonth||'本月',d.attHalf2StartDay||12,d.attHalf2EndMonth||'本月',d.attHalf2EndDay||26):weekRange('attendanceWeek',d.attendanceWeekStart);var organization='<div class="period-field-stack">'+radioGroup('适用组织','scope',scope,[{value:'all',label:'全部'},{value:'custom',label:'自定义'}],true)+(scope==='custom'?'<div class="period-org-select">'+pillList('orgs',d.orgs||['J&T集团-集团总部-产研中心-产研标准化部-HR系统研发','信息科技部','人力资源部'],true)+'</div>':'')+'</div>';var payCycle='<div class="period-field-stack">'+radioGroup('发薪周期','cycle',cycle,[{value:'月薪',label:'月薪'},{value:'半月薪',label:'半月薪'},{value:'周薪',label:'周'}],true)+'<div class="period-selection-panel"><div class="period-panel-title">算薪起止日</div>'+salaryRanges+'</div></div>';var attendanceCycle='<div class="period-field-stack">'+radioGroup('考勤周期','attendance',attendance,[{value:'same',label:'与算薪周期一致'},{value:'custom',label:'自定义'}],true)+(attendance==='custom'?'<div class="period-selection-panel">'+attendanceRanges+'</div>':'')+'</div>';var content='<div class="period-form-fields">'+textInput('期间规则名称','name',d.name,true,'请输入',{count:50,multilang:true})+organization+payCycle+attendanceCycle+(cycle!=='周薪'?'<div class="field"><label class="field-label required">首个期间生成日期</label><input class="control" type="date" data-bind="first" value="'+esc(d.first||'')+'"></div>':'')+textArea('描述','desc',d.desc,'请输入')+'</div>';return drawerFrame(d.id?'编辑':'新增',content,false)}
+      function renderSalaryEntryDrawer(){
+        var d=state.formDraft||{};
+        var emp=state.employees.find(function(e){return e.id===d.employeeId})||state.employees[0];
+        var isAdjust=d.mode==='adjust';
+        var labels=d.amounts||{'基本工资':'31,000.00','固定津贴':'2,000.00','交通津贴':'800.00'};
+        var salaryFields=Object.keys(labels).map(function(name){
+          var required=isAdjust&&name==='基本工资'?'required':'';
+          return '<div class="field"><label class="field-label '+required+'">'+esc(name)+'</label><input class="control" data-amount="'+esc(name)+'" value="'+esc(labels[name])+'"></div>'
+        }).join('');
+        var dateField='<div class="field"><label class="field-label required">生效日期</label><input class="control" type="date" data-bind="effectiveDate" value="'+esc(d.effectiveDate||'2026-11-24')+'" min="2026-11-23" max="2027-01-23"></div>';
+        var currencyField='<div class="field"><label class="field-label required">币种</label><input class="control" readonly value="'+esc(emp.currency)+'"></div>';
+        var reasons=['入职定薪','单独调薪','调级调薪','晋升调薪','年度调薪','其他'];
+        var reasonField=selectInput('定调薪原因','reason',d.reason||(isAdjust?'单独调薪':'入职定薪'),reasons,true,false);
+        var noteLabel=isAdjust?'定调薪说明':'定薪说明';
+        var entryContent='<div class="salary-entry-content"><section class="salary-entry-section salary-entry-profile-section"><div class="salary-entry-title">基本信息<button class="drawer-close" data-action="close-drawer" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div>'+archiveProfileCard(emp)+'</section><section class="salary-entry-section salary-entry-form-section"><div class="salary-entry-title">薪资信息</div><div class="salary-entry-fields">'+dateField+reasonField+currencyField+salaryFields+'<div class="field salary-entry-note"><label class="field-label">'+noteLabel+'</label><textarea class="textarea" data-bind="note" placeholder="请输入">'+esc(d.note||'')+'</textarea></div></div></section></div><div class="salary-entry-footer"><button class="btn" data-action="cancel-drawer">取消</button><button class="btn primary" data-action="save-drawer">保存</button></div>';
+        return '<div class="overlay" data-action="overlay-close"><section class="drawer salary-entry-drawer" onclick="event.stopPropagation()">'+entryContent+'</section></div>'
+      }
+      function archiveProfileCard(emp){return '<div class="archive-profile-card"><div class="archive-profile-cell"><span class="archive-profile-label">雇佣记录编号</span><span class="archive-profile-value">'+esc(emp.id)+'</span></div><div class="archive-profile-cell"><span class="archive-profile-label">姓名</span><span class="archive-profile-value">'+esc(emp.name)+'</span></div><div class="archive-profile-cell"><span class="archive-profile-label">工号</span><span class="archive-profile-value">'+esc(emp.no)+'</span></div><div class="archive-profile-cell"><span class="archive-profile-label">薪资组</span><span class="archive-profile-value">'+esc(emp.group)+'</span></div><div class="archive-profile-cell"><span class="archive-profile-label">需求状态</span><span class="archive-profile-value"><span class="status">在职</span></span></div><div class="archive-profile-cell"><span class="archive-profile-label">部门</span><span class="archive-profile-value">'+esc(emp.dept)+'</span></div><div class="archive-profile-cell"><span class="archive-profile-label">岗位</span><span class="archive-profile-value"><span>'+esc(emp.job)+'</span><span class="archive-profile-tags"><span class="tag">主岗</span></span></span></div></div>'}
+      function historyAction(record,index,empId){var canDelete=!record.first&&!record.locked&&!record.paid;var trash='<img src="assets/figma-icons/archive-delete.svg" alt="">';var remove=canDelete?'<button class="history-trash" data-action="delete-record" data-emp="'+esc(empId)+'" data-record="'+esc(record.id)+'" title="删除">'+trash+'</button>':'<span class="history-trash tip-pill disabled-tip">'+trash+'<span class="tooltip">'+(record.first?'首条薪资档案不能删除':'该薪资档案已用于锁定、完成或已发放的活动，不能删除')+'</span></span>';var kindClass=record.kind==='调薪'?'kind-adjust':'kind-neutral';var statusClass=record.status==='待生效'?'status-pending':record.status==='当前生效'?'status-current':'status-history';return '<div class="history-item '+(record.id===state.selectedRecord?'selected':'')+'" data-action="select-record" data-record="'+esc(record.id)+'"><div class="history-date"><img class="history-marker" src="assets/figma-icons/archive-timeline-marker.svg" alt=""><span>'+esc(record.date)+'</span></div><div class="history-statuses"><span class="tag '+kindClass+'">'+esc(record.kind)+'</span><span class="tag '+statusClass+'">'+esc(record.status)+'</span></div>'+remove+'</div>'}
+      function renderArchiveDetailDrawer(){var emp=state.employees.find(function(e){return e.id===state.drawer.employeeId})||state.employees[0];var records=(state.archive[emp.id]||[]).slice().sort(function(a,b){return b.date.localeCompare(a.date)});var selected=records.find(function(r){return r.id===state.selectedRecord})||records[1]||records[0];if(selected&&state.selectedRecord!==selected.id)state.selectedRecord=selected.id;var canCorrect=selected&&!selected.locked&&!selected.paid;var correction=canCorrect?'<button class="btn ghost-red archive-correction" data-action="correct-record" data-record="'+esc(selected.id)+'">更正</button>':'<span class="tip-pill archive-correction-wrap"><button class="btn archive-correction" disabled>更正</button><span class="tooltip">该薪资档案已用于锁定、完成或已发放的活动，不能更正</span></span>';var currentItems=selected?selected.items:{};var itemNames=Object.keys(currentItems||{});var total=fmtNum(itemNames.reduce(function(sum,key){return sum+Number(currentItems[key]||0)},0));var info='<div class="archive-detail-block"><div class="archive-detail-subtitle"><span class="archive-title-mark"></span><span>基础信息</span></div><div class="detail-info-box archive-main-info"><div><label>生效日期</label><span class="archive-info-value">'+esc(selected?selected.date:'—')+'</span></div><div><label>币种</label><span class="archive-info-value">'+esc(selected?selected.currency:emp.currency)+'</span></div><div><label>月薪总额</label><span class="archive-info-value">'+total+'</span></div><div><label>'+esc(selected&&selected.kind==='调薪'?'定调调薪原因':'定薪原因')+'</label><span class="archive-info-value">'+esc(selected?selected.reason:'—')+'</span></div><div><label>定调调薪说明</label><span class="archive-info-value">'+esc(selected&&selected.note?selected.note:'—')+'</span></div></div></div>';var salaryRows=selected&&selected.kind==='调薪'?itemNames.map(function(key){var previous=records.filter(function(record){return record.date<selected.date}).sort(function(a,b){return b.date.localeCompare(a.date)})[0];var oldValue=previous&&previous.items&&previous.items[key]!=null?previous.items[key]:currentItems[key];var newValue=currentItems[key];var valueClass=Number(newValue)>Number(oldValue)?'value-red':Number(newValue)<Number(oldValue)?'value-green':'';return '<tr><td>'+esc(key)+'</td><td>'+fmtNum(oldValue)+'</td><td>→</td><td class="'+valueClass+'">'+fmtNum(newValue)+'</td></tr>'}).join(''):itemNames.map(function(key){return '<tr><td>'+esc(key)+'</td><td>'+fmtNum(currentItems[key])+'</td></tr>'}).join('');var salaryHead=selected&&selected.kind==='调薪'?'<tr><th>薪资项</th><th>调整前</th><th></th><th>调整后</th></tr>':'<tr><th>薪资项</th><th>薪资</th></tr>';var salary='<div class="archive-detail-block"><div class="archive-detail-subtitle"><span class="archive-title-mark"></span><span>薪资项</span></div><table class="value-table"><thead>'+salaryHead+'</thead><tbody>'+salaryRows+'</tbody></table></div>';var operation='<div class="archive-detail-block"><div class="archive-detail-subtitle"><span class="archive-title-mark"></span><span>操作信息</span></div><div class="detail-info-box archive-operation-info"><div><label>操作人</label><span class="archive-info-value">'+esc(selected&&(selected.updatedBy||selected.creator)||'张舒')+'</span></div><div><label>操作时间</label><span class="archive-info-value">'+esc(selected&&(selected.updatedAt||'2026-09-01 10:00'))+'</span></div><div><label>操作备注</label><span class="archive-info-value">'+esc(selected&&selected.operationNote||'—')+'</span></div></div></div>';var historyRows=records.map(function(record,index){return historyAction(record,index,emp.id)}).join('');var content='<div class="archive-detail-content"><div class="archive-top-section"><div class="drawer-header archive-detail-title">薪资档案详情</div>'+archiveProfileCard(emp)+'</div><div class="archive-history-section"><div class="archive-section-heading"><div class="archive-section-heading-label"><span class="archive-title-mark"></span><span>操作记录</span></div><div class="section-actions"><button class="btn ghost-red archive-start-adjust" data-action="adjust-salary" data-id="'+esc(emp.id)+'">发起调薪</button></div></div><div class="history-layout"><div class="history-list"><div class="history-head">历史记录</div><div class="history-items"><img class="history-timeline-line" src="assets/figma-icons/archive-timeline-dash.svg" alt="">'+historyRows+'</div></div><div class="history-pane"><div class="history-toolbar"><span>'+esc(selected&&selected.kind==='调薪'?'调薪记录':'定薪记录')+'</span>'+correction+'</div><div class="history-detail">'+info+salary+operation+'</div></div></div></div></div><div class="archive-detail-footer"><button class="btn" data-action="close-drawer">关闭</button></div><button class="drawer-close archive-close" data-action="close-drawer" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button>';return '<div class="overlay" data-action="overlay-close"><section class="drawer archive-detail-drawer" onclick="event.stopPropagation()">'+content+'</section></div>'}
+      function renderDrawer(){if(!state.drawer)return '';if(state.drawer.type==='group')return renderGroupDrawer();if(state.drawer.type==='item')return renderItemDrawer();if(state.drawer.type==='subject')return renderSubjectDrawer();if(state.drawer.type==='period')return renderPeriodDrawer();if(state.drawer.type==='salary')return renderSalaryEntryDrawer();if(state.drawer.type==='detail')return renderArchiveDetailDrawer();return ''}
+      function renderLanguageModal(){var f=state.modal.field||'name';var source=state.formDraft||{};var translations=source.translations||{};var defaultValue=source[f]||'';var rows=languages.map(function(lang){var val=lang.default?defaultValue:(translations[lang.key]||'');return '<div class="language-row"><label class="language-label"><span class="language-dot '+(!String(val||'').trim()?'empty':'')+'"></span>'+esc(lang.name)+(lang.default?'<span class="default-tag">默认</span>':'')+'</label><input class="control" '+(lang.default?'data-bind="'+esc(f)+'"':'data-lang="'+esc(lang.key)+'"')+' value="'+esc(val)+'" placeholder="请输入"></div>'}).join('');return '<div class="modal-layer" data-action="overlay-close"><section class="modal language-modal" onclick="event.stopPropagation()"><div class="modal-header">多语言选择<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body language-form">'+rows+'<button class="btn ghost-red small" data-action="ai-translate">AI翻译</button></div><div class="modal-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="save-language">保存</button></div></section></div>'}
+      function renderOrgModal(){var path=state.orgField||'orgs';var selected=state.formDraft&&state.formDraft[path]?Array.from(new Set(state.formDraft[path])):[];var salaryGroups=path==='scopeItems';var nodes;if(salaryGroups){var labels={};state.groups.forEach(function(g){labels[g.code.replace(/_/g,'-')]=g.name});var codes=Object.keys(labels).concat(selected);nodes=Array.from(new Set(codes)).map(function(code){return {l:0,n:code,id:code,label:labels[code]||'薪资组'}})}else{nodes=[{l:0,n:'10000000-J&T集团',id:'10000000'},{l:1,n:'10092156-子公司',id:'10092156'},{l:2,n:'10000021-奥索斯',id:'10000021'},{l:2,n:'张三（01836643）',id:'张三'},{l:2,n:'10108943-公司部门',id:'10108943'},{l:2,n:'10108945-公司部门组织类别',id:'10108945'},{l:1,n:'10092155-国家公司',id:'10092155'},{l:2,n:'10021115-越南J&T',id:'10021115'},{l:3,n:'10057281-分公司',id:'10057281'},{l:4,n:'10057360-胡志明分公司',id:'10057360'},{l:5,n:'10057288-转运中心',id:'10057288'},{l:6,n:'10062856-胡志明 028GW0',id:'10062856'},{l:7,n:'10074081-操作管理组',id:'10074081'},{l:7,n:'10074082-数据管理组',id:'10074082'},{l:7,n:'10074084-管理保障组',id:'10074084'}]}var left=nodes.map(function(n){var checked=selected.indexOf(n.n)>=0?'checked':'';var treeIndent=salaryGroups?'':'<span class="indent" style="width:'+(n.l*16)+'px"></span><span class="tree-arrow">'+(n.l<6?'▸':'')+'</span>';return '<div class="org-node">'+treeIndent+'<input type="checkbox" data-org="'+esc(n.n)+'" '+checked+'><span>'+esc(n.n)+(salaryGroups?'<span class="muted">　'+esc(n.label)+'</span>':'')+'</span></div>'}).join('');var right=selected.map(function(n){return '<div class="org-selected-row">'+esc(n)+'<button data-action="remove-org-modal" data-org="'+esc(n)+'">×</button></div>'}).join('');return '<div class="modal-layer" data-action="overlay-close"><section class="modal org-modal" onclick="event.stopPropagation()"><div class="modal-header">'+(salaryGroups?'选择薪资组':'选择组织')+'<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body"><div class="org-columns"><div class="org-pane"><div class="org-pane-head"><label><input type="checkbox" data-org-all '+(selected.length>=nodes.length?'checked':'')+'> 全选</label><span>'+selected.length+'/'+nodes.length+'</span></div><div class="org-list">'+left+'</div></div><div class="org-pane"><div class="org-pane-head">已选'+(salaryGroups?'薪资组':'部门')+'（'+selected.length+'）<span class="org-header-action-icon" aria-hidden="true"><img src="assets/figma-icons/org-clear.svg" alt=""></span></div><div class="org-list">'+right+'</div></div></div></div><div class="modal-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="confirm-org">确定</button></div></section></div>'}
+      function renderSubjectDisableModal(){return '<div class="modal-layer" data-action="overlay-close"><section class="modal subject-disable-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()"><div class="subject-disable-head"><div class="subject-disable-title"><span class="alert-mark">!</span><span>停用</span></div><button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="subject-disable-divider"></div><div class="subject-disable-message"><span>停用后，算薪规则将不可关联该薪资科目</span><span>已关联的薪资科目不受影响</span></div><div class="subject-disable-actions"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="confirm-modal">确定</button></div></section></div>'}
+      function renderConfirmModal(){var m=state.modal;if(m.actionType==='toggle-subject')return renderSubjectDisableModal();var text=m.message||'';var title=m.title||'确认';var cancel=m.cancel!==false;return '<div class="modal-layer" data-action="overlay-close"><section class="modal" onclick="event.stopPropagation()"><div class="modal-header"><span class="alert-mark">!</span>'+esc(title)+'<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body" style="text-align:center;color:#555;padding:22px 22px">'+text+'</div><div class="modal-footer '+(m.even?'even':'')+'">'+(cancel?'<button class="btn" data-action="cancel-modal">取消</button>':'')+'<button class="btn primary" data-action="confirm-modal">'+esc(m.confirmText||'确定')+'</button></div></section></div>'}
+      function renderDeleteModal(){var m=state.modal;var d=state.formDraft||{};return '<div class="modal-layer" data-action="overlay-close"><section class="modal" onclick="event.stopPropagation()"><div class="modal-header"><span class="alert-mark">!</span>删除薪资档案<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body"><div style="text-align:center;margin:3px 0 18px">确定删除 <strong style="color:var(--brand);background:#fff1f1;padding:1px 5px">'+esc(m.recordDate||'')+'</strong> 生效的薪资档案吗？</div>'+textArea('操作备注','deleteNote',d.deleteNote,'请输入')+'</div><div class="modal-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="confirm-delete">确认删除</button></div></section></div>'}
+      function renderCorrectionModal(){var d=state.formDraft||{};var selected=state.archive[state.drawer.employeeId].find(function(r){return r.id===state.modal.recordId})||state.archive[state.drawer.employeeId].find(function(r){return r.id===state.selectedRecord});var affected=selected&&selected.snapshot?'受影响活动：'+(selected.snapshotActivity||'2026年10月薪资核算（草稿）'):'当前档案尚未进入算薪快照';return '<div class="modal-layer" data-action="overlay-close"><section class="modal" onclick="event.stopPropagation()"><div class="modal-header">更正薪资档案<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body"><div class="field"><label class="field-label required">生效日期</label><input class="control" type="date" data-bind="effectiveDate" value="'+esc(d.effectiveDate||selected.date)+'" '+(selected&&selected.snapshot?'disabled':'')+'></div>'+selectInput('定调薪原因','reason',d.reason||selected.reason,['入职定薪','单独调薪','调级调薪/晋升调薪','年度调薪','其他'],true,false)+'<div class="field"><label class="field-label required">币种</label><input class="control" readonly value="'+esc(selected.currency)+'"></div>'+Object.keys(selected.items).map(function(k){return '<div class="field"><label class="field-label">'+esc(k)+'</label><input class="control" data-correct-amount="'+esc(k)+'" value="'+esc(selected.items[k])+'"></div>'}).join('')+textArea('定调调薪说明','note',d.note,'请输入')+textArea('操作备注','operationNote',d.operationNote,'请输入')+'<div class="inline-note">'+esc(affected)+'</div></div><div class="modal-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="save-correction">确定</button></div></section></div>'}
+      function renderColumnModal(){var chosen=state.formDraft&&state.formDraft.columns?state.formDraft.columns:(state.columns||initial.columns);var options=state.columnOptions||initial.columnOptions;var free=options.filter(function(x){return chosen.indexOf(x)<0});return '<div class="modal-layer" data-action="overlay-close"><section class="modal column-modal" onclick="event.stopPropagation()"><div class="modal-header">选择表头显示内容<button class="modal-x" data-action="close-modal" aria-label="关闭"><img src="assets/figma-icons/drawer-close.svg" alt=""></button></div><div class="modal-body"><div class="column-columns"><div class="column-pane"><div class="column-head"><label><input type="checkbox" data-column-all '+(free.length===0?'checked':'')+'> 全选</label><span> '+chosen.length+'/'+options.length+'</span></div><input class="column-search" placeholder="搜索可选属性"><div class="column-options-scroll"><div class="column-section-title">基本信息</div>'+options.slice(0,14).map(function(c){var checked=chosen.indexOf(c)>=0;var fixed=['工号','姓名'].indexOf(c)>=0;return '<label class="column-option"><input type="checkbox" data-column="'+esc(c)+'" '+(checked?'checked':'')+' '+(fixed?'disabled':'')+'>'+esc(c)+(fixed?'<span class="muted">固定</span>':'')+'</label>'}).join('')+'<div class="column-section-title">薪资项</div>'+options.slice(14).map(function(c){return '<label class="column-option"><input type="checkbox" data-column="'+esc(c)+'" '+(chosen.indexOf(c)>=0?'checked':'')+' '+(c==='基本工资'?'disabled':'')+'>'+esc(c)+(c==='基本工资'?'<span class="muted">固定</span>':'')+'</label>'}).join('')+'</div></div><div class="column-pane"><div class="column-head">已选属性（'+chosen.length+'）<button class="group-control" data-action="reset-columns" title="恢复默认"><img src="assets/figma-icons/group-delete.svg" alt=""></button></div><div class="column-selected-list">'+chosen.map(function(c,i){return '<div class="column-selected" draggable="true" data-col-index="'+i+'"><span class="drag-handle">⠿</span>'+esc(c)+'<button class="remove" data-action="remove-column" data-col="'+esc(c)+'">×</button></div>'}).join('')+'</div></div></div></div><div class="modal-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="save-columns">确定</button></div></section></div>'}
+      function renderBatchImportModal(){var file=state.formDraft&&state.formDraft.file;var selections=state.formDraft&&state.formDraft.importItems||['基本工资','固定津贴','交通津贴'];var names=['基本工资','固定津贴','交通津贴','夜班津贴'];return '<div class="modal-layer" data-action="overlay-close"><section class="modal batch-import-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()"><div class="batch-import-content"><section class="batch-import-section batch-import-template-section"><div class="batch-import-title">下载导入模版</div><div class="batch-import-template-panel"><div class="batch-import-items">'+names.map(function(n){var disabled=n==='夜班津贴';return '<label class="batch-import-option"><input type="checkbox" data-import-item="'+esc(n)+'" '+(selections.indexOf(n)>=0?'checked':'')+' '+(disabled?'disabled':'')+'><span class="batch-import-option-text">'+esc(n)+'</span>'+(disabled?'<span class="batch-import-disabled-tag">已停用</span>':'')+'</label>'}).join('')+'</div><div class="batch-import-divider" aria-hidden="true"></div><button class="batch-import-download" data-action="download-template"><span>下载Excel模板</span><img src="assets/figma-icons/import-download.svg" alt=""></button></div></section><section class="batch-import-section batch-import-upload-section"><div class="batch-import-title">上传填写后的文件</div><div class="upload-drop batch-import-drop" data-action="choose-file">'+(file?'<div class="batch-import-file"><div class="batch-import-file-name">'+esc(file)+'</div><div class="batch-import-file-actions"><button class="link-red" data-action="reupload">重新上传</button><button class="link-red" data-action="remove-upload">删除</button></div></div>':'<div class="batch-import-upload-icon"><img src="assets/figma-icons/import-upload.svg" alt=""></div><div class="batch-import-upload-copy"><div class="batch-import-upload-prompt">将文件拖拽到此处，或 <button data-action="choose-file">点击上传</button></div><div class="batch-import-upload-hint">请上传xlsx标准格式文件</div></div>')+'</div></section><input type="file" id="import-file" accept=".xlsx,.xls,.csv" class="hidden"></div><div class="batch-import-footer"><button class="btn" data-action="cancel-modal">取消</button><button class="btn primary" data-action="confirm-import">确定</button></div></section></div>'}
+      function renderModal(){if(!state.modal)return '';if(state.modal.type==='language')return renderLanguageModal();if(state.modal.type==='org')return renderOrgModal();if(state.modal.type==='subject-group')return renderSubjectGroupModal();if(state.modal.type==='confirm')return renderConfirmModal();if(state.modal.type==='delete-record')return renderDeleteModal();if(state.modal.type==='correction')return renderCorrectionModal();if(state.modal.type==='columns')return renderColumnModal();if(state.modal.type==='import')return renderBatchImportModal();return ''}
+
+      function clone(obj){return JSON.parse(JSON.stringify(obj||{}))}
+      function setPath(obj,path,value){var parts=path.split('.');var target=obj;for(var i=0;i<parts.length-1;i++){if(!target[parts[i]]||typeof target[parts[i]]!=='object')target[parts[i]]={};target=target[parts[i]]}target[parts[parts.length-1]]=value}
+      function setToast(text,error){state.toast={text:text,error:!!error};renderApp();clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(function(){state.toast=null;renderApp()},2400)}
+      function openGroup(id){var item=id?state.groups.find(function(g){return g.id===id}):null;state.drawer={type:'group'};state.formDraft=item?Object.assign({},clone(item),{id:item.id}):{code:'',name:'',country:'泰国',currency:'THB',scope:'all',orgs:[],desc:'',translations:{}};renderApp()}
+      function openItem(id){var item=id?state.items.find(function(i){return i.id===id}):null;var max=state.items.reduce(function(m,i){return Math.max(m,Number(i.seq)||0)},0);var defaultSeq=Math.floor(max/10)*10+10;state.drawer={type:'item'};state.formDraft=item?Object.assign({},clone(item),{id:item.id,scopeValue:item.scopeValue||(item.scope==='全部薪资组'?'all':'custom'),scopeItems:item.scopeItems||['TH-BKK','TH-CNK','TH-FACT','VN-SGN']}):{code:'',name:'',seq:defaultSeq,type:'数值',unit:'半月',scopeValue:'custom',scopeItems:['TH-BKK','TH-CNK','TH-FACT','VN-SGN'],desc:'',translations:{}};renderApp()}
+      function openSubject(id){var item=null;var groupId='';state.subjectGroups.forEach(function(g){var found=g.items.find(function(i){return i.id===id});if(found){item=found;groupId=g.id}});state.drawer={type:'subject'};state.formDraft=item?Object.assign({},clone(item),{id:item.id,groupId:groupId}):{code:'',name:'',type:'文本',scope:'all',orgs:[],groupId:state.subjectGroups[1]?state.subjectGroups[1].id:'',desc:'',translations:{}};renderApp()}
+      function openPeriod(id){var item=id?state.periods.find(function(p){return p.id===id}):null;state.drawer={type:'period'};state.formDraft=item?Object.assign({},clone(item),{id:item.id,scope:item.scope==='全部组织'?'all':'custom',cycle:item.cycle,attendance:item.attendance||'same',orgs:item.scope==='全部组织'?[]:(item.orgs||['J&T集团-集团总部-产研中心-产研标准化部-HR系统研发','信息科技部','人力资源部']),salaryStartMonth:item.salaryStartMonth||'本月',salaryStartDay:item.salaryStartDay||1,salaryEndMonth:item.salaryEndMonth||'本月',salaryEndDay:item.salaryEndDay||31,first:item.first||''}):{name:'',scope:'custom',cycle:'月薪',attendance:'same',orgs:['J&T集团-集团总部-产研中心-产研标准化部-HR系统研发','信息科技部','人力资源部'],salaryStartMonth:'本月',salaryStartDay:1,salaryEndMonth:'本月',salaryEndDay:31,first:'',desc:'',translations:{}};renderApp()}
+      function openSubjectGroup(id){var g=id?state.subjectGroups.find(function(x){return x.id===id}):null;state.formDraft=g?Object.assign({},clone(g),{id:g.id}):{name:'',translations:{}};state.modal={type:'subject-group'};renderApp()}
+      function openSalary(employeeId,mode){var emp=state.employees.find(function(e){return e.id===employeeId})||state.employees[0];var records=state.archive[emp.id]||[];var current=records.filter(function(r){return r.status==='当前生效'||r.status==='待生效'}).sort(function(a,b){return b.date.localeCompare(a.date)})[0];var amounts=current?clone(current.items):{'基本工资':31000,'固定津贴':2000,'交通津贴':800};var effectiveDate='2026-11-24';if(mode==='adjust'&&current&&current.date>=effectiveDate){var nextDate=new Date(current.date+'T00:00:00');nextDate.setDate(nextDate.getDate()+1);effectiveDate=nextDate.getFullYear()+'-'+String(nextDate.getMonth()+1).padStart(2,'0')+'-'+String(nextDate.getDate()).padStart(2,'0')}state.drawer={type:'salary'};state.formDraft={mode:mode,employeeId:emp.id,effectiveDate:effectiveDate,reason:mode==='adjust'?'单独调薪':'入职定薪',currency:emp.currency,amounts:amounts,note:''};renderApp()}
+      function openArchive(employeeId){state.archiveView='all';state.page='archives';state.drawer={type:'detail',employeeId:employeeId};var records=state.archive[employeeId]||[];var current=records.find(function(r){return r.status==='当前生效'})||records[0];state.selectedRecord=current?current.id:null;renderApp()}
+      function toggleStatus(collection,id){var list=state[collection];var record=list.find(function(x){return x.id===id});if(!record)return;var turningOff=record.status==='启用';var title=collection==='groups'?'停用薪资组':collection==='items'?'停用':'停用';var message=collection==='groups'?'停用后，算薪方案将不可关联该薪资组，已关联的算薪方案不受影响。该薪资组下仍有 <span style="color:var(--brand)">X</span> 位人员，去调整。':collection==='items'?'停用后，定薪/调薪将不可选用该薪资项，已录入的员工档案数据不受影响。':'停用后，新建算薪流程将不再使用该期间规则。';state.modal={type:'confirm',title:title,message:message,confirmText:collection==='groups'?'去调整':'确定',cancel:true,even:true,actionType:'toggle',collection:collection,id:id,turningOff:turningOff};renderApp()}
+      function showGroupDelete(id){var g=state.subjectGroups.find(function(x){return x.id===id});if(!g)return;if(g.items.length){state.modal={type:'confirm',title:'删除分组',message:'该分组下已有薪资科目，无法删除',confirmText:'确定',cancel:false};state.pendingDeleteGroup=null}else{state.modal={type:'confirm',title:'删除分组',message:'确定删除该薪资科目分组吗？',confirmText:'确定',cancel:true,actionType:'delete-subject-group',id:id}}renderApp()}
+      function saveGroup(){var d=state.formDraft||{};if(!d.code||!d.name||!d.country||!d.currency){setToast('请填写必填项',true);return}if(!/^[A-Z][A-Z0-9_]{1,39}$/.test(d.code)){setToast('编码需以大写字母开头，仅支持大写字母、数字和下划线',true);return}if(state.groups.some(function(g){return g.code===d.code&&g.id!==d.id})){setToast('薪资组编码已存在',true);return}if(state.groups.some(function(g){return g.name===d.name&&g.id!==d.id})){setToast('薪资组名称已存在',true);return}if(d.scope==='custom'&&!(d.orgs||[]).length){setToast('请选择授权组织',true);return}if(d.id){var idx=state.groups.findIndex(function(g){return g.id===d.id});state.groups[idx]=Object.assign({},state.groups[idx],clone(d))}else{d.id=uid('g');d.status='启用';d.creator='张舒';d.created='2026-11-23 10:00:00';state.groups.unshift(clone(d))}state.drawer=null;state.formDraft=null;persist();renderApp();setToast('保存成功')}
+      function saveItem(){var d=state.formDraft||{};var seq=Number(d.seq);if(!d.code||!d.name||!Number.isInteger(seq)||seq<=0){setToast('请填写必填项，序号须为正整数',true);return}if(state.items.some(function(i){return i.code===d.code&&i.id!==d.id})){setToast('薪资项编码已存在',true);return}if(d.scopeValue==='custom'&&!(d.scopeItems||[]).length){setToast('请选择适用范围',true);return}var item=Object.assign({},clone(d),{seq:seq,scope:d.scopeValue==='all'?'全部薪资组':'自定义'});if(d.id){var idx=state.items.findIndex(function(i){return i.id===d.id});state.items[idx]=Object.assign({},state.items[idx],item)}else{item.id=uid('i');item.status='启用';item.creator='张舒';state.items.push(item)}state.drawer=null;state.formDraft=null;persist();renderApp();setToast('保存成功')}
+      function saveSubject(){var d=state.formDraft||{};if(!d.code||!d.name){setToast('请填写必填项',true);return}var oldGroup=null;var oldItem=null;state.subjectGroups.forEach(function(g){var f=g.items.find(function(i){return i.id===d.id});if(f){oldGroup=g;oldItem=f}});if(d.id&&oldGroup){oldGroup.items=oldGroup.items.filter(function(i){return i.id!==d.id})}var target=state.subjectGroups.find(function(g){return g.id===d.groupId})||state.subjectGroups[1];if(d.id&&oldItem){target.items.push(Object.assign({},oldItem,clone(d)))}else{target.items.push(Object.assign({id:uid('s'),status:'启用',creator:'张舒'},clone(d)))}state.drawer=null;state.formDraft=null;persist();renderApp();setToast('保存成功')}
+      function savePeriod(){var d=state.formDraft||{};if(d.cycle==='周薪'){if(typeof d.salaryWeekStart==='undefined')d.salaryWeekStart='2026-12-07';d.salaryWeekEnd=addDateDays(d.salaryWeekStart,6);if(d.attendance==='custom'){if(typeof d.attendanceWeekStart==='undefined')d.attendanceWeekStart='2026-12-07';d.attendanceWeekEnd=addDateDays(d.attendanceWeekStart,6)}}if(!d.name){setToast('请输入期间规则名称',true);return}if(d.scope==='custom'&&!(d.orgs||[]).length){setToast('请选择授权组织',true);return}if(d.cycle!=='周薪'&&!d.first){setToast('请选择首个期间生成日期',true);return}if(state.periods.some(function(p){return p.name===d.name&&p.id!==d.id})){setToast('期间规则名称已存在',true);return}var item=Object.assign({},clone(d),{scope:d.scope==='all'?'全部组织':(d.orgs||[]).join('、')});if(d.id){var idx=state.periods.findIndex(function(p){return p.id===d.id});state.periods[idx]=Object.assign({},state.periods[idx],item)}else{item.id=uid('p');item.status='启用';item.creator='张舒';state.periods.unshift(item)}state.drawer=null;state.formDraft=null;persist();renderApp();setToast('保存成功')}
+      function saveSalary(){var d=state.formDraft||{};var emp=state.employees.find(function(e){return e.id===d.employeeId});if(!d.effectiveDate||!d.reason){setToast('请填写生效日期和原因',true);return}var from=new Date('2026-11-23T00:00:00');var min=new Date(from);min.setDate(min.getDate()+1);var max=new Date(from);max.setMonth(max.getMonth()+2);var chosen=new Date(d.effectiveDate+'T00:00:00');if(chosen<min||chosen>max){setToast('生效日期只能选择未来两个月内',true);return}var amounts={};Object.keys(d.amounts||{}).forEach(function(k){amounts[k]=Number(String(d.amounts[k]).replace(/,/g,''))||0});var oldRecords=state.archive[emp.id]||[];if(d.mode==='adjust'){var current=oldRecords.filter(function(r){return r.status==='当前生效'||r.status==='待生效'}).sort(function(a,b){return b.date.localeCompare(a.date)})[0];if(current&&d.effectiveDate<=current.date){setToast('生效日期须晚于当前薪资档案生效日期',true);return}var changed=Object.keys(amounts).some(function(k){return Number(amounts[k])!==Number(current&&current.items[k]||0)});if(!changed){setToast('至少需要调整一个薪资项',true);return}oldRecords.forEach(function(r){if(r.status==='待生效'&&r.date<d.effectiveDate)r.status='历史'});oldRecords.push({id:uid('r'),date:d.effectiveDate,kind:'调薪',status:'待生效',currency:emp.currency,reason:d.reason,note:d.note||'',items:amounts,locked:false,paid:false,first:false})}else{oldRecords.push({id:uid('r'),date:d.effectiveDate,kind:'定薪',status:'待生效',currency:emp.currency,reason:d.reason,note:d.note||'',items:amounts,locked:false,paid:false,first:true});emp.needSalary=false}state.archive[emp.id]=oldRecords;state.drawer=null;state.formDraft=null;state.page='archives';state.archiveView='all';persist();renderApp();setToast(d.mode==='adjust'?'调薪成功，历史档案已保留':'薪资档案建立成功')}
+      function saveSubjectGroup(){var d=state.formDraft||{};if(!d.name){setToast('请输入分组名称',true);return}if(state.subjectGroups.some(function(g){return g.name===d.name&&g.id!==d.id})){setToast('分组名称已存在',true);return}if(d.id){var idx=state.subjectGroups.findIndex(function(g){return g.id===d.id});state.subjectGroups[idx].name=d.name;state.subjectGroups[idx].translations=d.translations||{}}else{state.subjectGroups.push({id:uid('sg'),name:d.name,translations:d.translations||{},expanded:true,items:[]})}state.modal=null;state.formDraft=null;persist();renderApp();setToast('保存成功')}
+      function saveCurrentDrawer(){if(state.modal&&state.modal.type==='subject-group'){saveSubjectGroup();return}if(!state.drawer){setToast('已保存');return}if(state.drawer.type==='group'){saveGroup();return}if(state.drawer.type==='item'){saveItem();return}if(state.drawer.type==='subject'){saveSubject();return}if(state.drawer.type==='period'){savePeriod();return}if(state.drawer.type==='salary'){saveSalary();return}}
+      function closeModal(){var type=state.modal&&state.modal.type;if(type==='org'&&state.formDraft&&state.orgField)state.formDraft[state.orgField]=(state.orgOriginal||[]).slice();state.orgOriginal=null;state.modal=null;if(['language','org','confirm'].indexOf(type)<0){if(type==='subject-group'||type==='columns'||type==='import'||type==='delete-record'||type==='correction')state.formDraft=null}renderApp()}
+      function closeDrawer(){state.drawer=null;state.formDraft=null;renderApp()}
+      function currentEmployee(){return state.employees.find(function(e){return e.id===state.drawer.employeeId})||state.employees[0]}
+      function openLanguage(field){state.modal={type:'language',field:field||'name'};if(!state.formDraft.translations)state.formDraft.translations={};renderApp()}
+      function addOrRemoveValue(path,value,add){var arr=state.formDraft[path]||[];if(add&&arr.indexOf(value)<0)arr.push(value);if(!add)arr=arr.filter(function(x){return x!==value});state.formDraft[path]=arr}
+      function confirmAction(){var m=state.modal;if(!m)return;if(m.actionType==='toggle-subject'){var subject=null;state.subjectGroups.some(function(g){subject=g.items.find(function(i){return i.id===m.id});return !!subject});if(!subject||subject.status!=='启用'||isProtectedSubject(subject)){state.modal=null;renderApp();return}subject.status='停用';state.modal=null;persist();renderApp();setToast('状态已更新');return}if(m.actionType==='toggle'){var record=state[m.collection].find(function(x){return x.id===m.id});if(record)record.status=record.status==='启用'?'停用':'启用';state.modal=null;if(m.collection==='groups'&&m.turningOff){state.page='archives';state.archiveView='all';persist();renderApp();setToast('已进入员工薪资档案，可调整关联人员');return}persist();renderApp();setToast('状态已更新');return}if(m.actionType==='delete-subject-group'){state.subjectGroups=state.subjectGroups.filter(function(g){return g.id!==m.id});state.modal=null;persist();renderApp();setToast('分组已删除');return}state.modal=null;renderApp();setToast('已确认')}
+      function openRecordDelete(empId,recordId){var list=state.archive[empId]||[];var rec=list.find(function(r){return r.id===recordId});if(!rec)return;if(rec.first||rec.locked||rec.paid){setToast(rec.first?'首条薪资档案不能删除':'该薪资档案已用于锁定、完成或已发放的活动，不能删除',true);return}state.modal={type:'delete-record',employeeId:empId,recordId:recordId,recordDate:rec.date};state.formDraft={deleteNote:''};renderApp()}
+      function confirmDeleteRecord(){var m=state.modal;var list=state.archive[m.employeeId]||[];var rec=list.find(function(r){return r.id===m.recordId});if(!rec||rec.first||rec.locked||rec.paid){setToast('该薪资档案不可删除',true);return}state.archive[m.employeeId]=list.filter(function(r){return r.id!==m.recordId});state.modal=null;state.formDraft=null;persist();renderApp();setToast('薪资档案已删除')}
+      function openCorrection(recordId){var list=state.archive[state.drawer.employeeId]||[];var rec=list.find(function(r){return r.id===recordId});if(!rec)return;if(rec.locked||rec.paid){setToast('该薪资档案已用于锁定、完成或已发放的活动，不能更正',true);return}state.formDraft={effectiveDate:rec.date,reason:rec.reason,note:rec.note||'',operationNote:rec.operationNote||'',amounts:clone(rec.items)};state.modal={type:'correction',recordId:recordId};renderApp()}
+      function saveCorrection(){var m=state.modal;var rec=(state.archive[state.drawer.employeeId]||[]).find(function(r){return r.id===m.recordId});if(!rec)return;if(!state.formDraft.reason){setToast('请选择更正原因',true);return}if(!rec.snapshot&&state.formDraft.effectiveDate!==rec.date){var collision=(state.archive[state.drawer.employeeId]||[]).some(function(x){return x.id!==rec.id&&x.date===state.formDraft.effectiveDate});if(collision){setToast('该生效日期已有薪资档案',true);return}rec.date=state.formDraft.effectiveDate}rec.reason=state.formDraft.reason;rec.note=state.formDraft.note||'';rec.operationNote=state.formDraft.operationNote||'';rec.updatedBy='张舒';rec.updatedAt=new Date().toLocaleString('zh-CN',{hour12:false});Object.keys(state.formDraft.amounts||{}).forEach(function(k){rec.items[k]=Number(state.formDraft.amounts[k])||0});state.modal=null;state.formDraft=null;persist();renderApp();setToast('薪资档案已更正')}
+      function saveColumns(){state.columns=(state.formDraft&&state.formDraft.columns)||state.columns;state.modal=null;state.formDraft=null;persist();renderApp();setToast('列设置已保存')}
+      function downloadTemplate(){var items=state.formDraft&&state.formDraft.importItems||[];var headers=['工号','姓名','部门','岗位','生效日期','定调调薪原因','定调调薪说明'].concat(items);var csv='\ufeff'+headers.join(',')+'\n'+state.employees.slice(0,3).map(function(e){return [e.no,e.name,e.dept,e.job,'2026-12-01','单独调薪',''].concat(items.map(function(){return ''})).join(',')}).join('\n');var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='员工薪资档案批量导入模板.csv';a.click();URL.revokeObjectURL(a.href)}
+      function saveImport(){state.modal=null;state.formDraft=null;persist();renderApp();setToast('导入成功，已模拟完成薪资档案导入')}
+
+      function doAction(name,el,evt){var id=el&&el.getAttribute('data-id');
+        if(name==='nav'){state.page=el.getAttribute('data-page');if(state.page==='archives'){state.archiveView='all'}if(state.page==='unpriced'){state.archiveView='unpriced'}state.openFilter='';renderApp();return}
+        if(name==='toggle-settings'){state.settingsOpen=!state.settingsOpen;renderApp();return}
+        if(name==='search'){state.openFilter='';renderApp();return}
+        if(name==='toggle-select'){var selectId=el.getAttribute('data-select-id');state.openSelect=state.openSelect===selectId?'':selectId;renderApp();return}
+        if(name==='select-option'){var bind=el.getAttribute('data-select-bind'),value=el.getAttribute('data-select-value'),kind=el.getAttribute('data-select-kind'),multiple=el.getAttribute('data-select-multiple')==='true';if(kind==='year')state.year=Number(value);else if(kind==='page-size')state.pageSize=Number(value);else if(bind&&state.formDraft){if(multiple){var target=state.formDraft;bind.split('.').forEach(function(part){target=target&&target[part]});var values=Array.isArray(target)?target.map(function(v){return String(v)}):[],index=values.indexOf(value);if(index>=0)values.splice(index,1);else values.push(value);setPath(state.formDraft,bind,values)}else setPath(state.formDraft,bind,value)}state.openSelect=multiple?el.getAttribute('data-select-id'):'';renderApp();return}
+        if(name==='toggle-filter'){var f=el.getAttribute('data-filter');state.openSelect='';state.openFilter=state.openFilter===f?'':f;renderApp();return}
+        if(name==='filter-select'){var key=el.getAttribute('data-filter');var value=el.getAttribute('data-value');if(value==='全部'){delete state.filters[key];state.openFilter=''}else{var values=filterValues(key).slice();var index=values.indexOf(value);if(index>=0)values.splice(index,1);else values.push(value);if(values.length)state.filters[key]=values;else delete state.filters[key];state.openFilter=key}renderApp();return}
+        if(name==='toggle-filter-visibility'){var field=el.getAttribute('data-filter-field'),page=filterPageKey(),definitions=filterDefinitions[page]||[],visible=state.filterVisibility[page];if(!Array.isArray(visible))visible=definitions.filter(function(d){return d[2]!==false}).map(function(d){return d[0]});var index=visible.indexOf(field);if(index>=0){visible.splice(index,1);delete state.filters[field]}else if(definitions.some(function(d){return d[0]===field})){visible.push(field)}state.filterVisibility[page]=visible;state.openFilter='__more__';persist();renderApp();return}
+        if(name==='clear-filter'){delete state.filters[el.getAttribute('data-filter')];state.openFilter='';renderApp();return}
+        if(name==='new-group'){openGroup();return}
+        if(name==='edit-group'){openGroup(id);return}
+        if(name==='toggle-group'){toggleStatus('groups',id);return}
+        if(name==='new-item'){openItem();return}
+        if(name==='edit-item'){openItem(id);return}
+        if(name==='toggle-item'){toggleStatus('items',id);return}
+        if(name==='new-subject-group'){openSubjectGroup();return}
+        if(name==='rename-subject-group'){openSubjectGroup(id);return}
+        if(name==='delete-subject-group'){showGroupDelete(id);return}
+        if(name==='toggle-subject-group'){var sg=state.subjectGroups.find(function(g){return g.id===id});if(sg){sg.expanded=!sg.expanded;renderApp()}return}
+        if(name==='new-subject'){openSubject();return}
+        if(name==='batch-subject'){openSubject();setToast('可逐项新增科目；批量导入在原型中仅展示入口');return}
+        if(name==='edit-subject'){openSubject(id);return}
+        if(name==='toggle-subject'){var subject=null;state.subjectGroups.some(function(g){subject=g.items.find(function(i){return i.id===id});return !!subject});if(!subject)return;if(subject.status==='启用'){if(isProtectedSubject(subject))return;state.modal={type:'confirm',actionType:'toggle-subject',id:id};renderApp();return}subject.status='启用';persist();renderApp();setToast('状态已更新');return}
+        if(name==='new-period'){openPeriod();return}
+        if(name==='edit-period'){openPeriod(id);return}
+        if(name==='toggle-period'){toggleStatus('periods',id);return}
+        if(name==='view-weekly'){state.selectedPeriod=id;state.page='weekly';renderApp();return}
+        if(name==='set-salary'){openSalary(id,'set');return}
+        if(name==='adjust-salary'){openSalary(id,'adjust');return}
+        if(name==='view-archive'){openArchive(id);return}
+        if(name==='show-unpriced'){state.page='unpriced';state.archiveView='unpriced';state.filters.archiveSearch='';renderApp();return}
+        if(name==='back-archive'){state.page='archives';state.archiveView='all';renderApp();return}
+        if(name==='batch-import'){state.formDraft={file:'',importItems:['基本工资','固定津贴','交通津贴']};state.modal={type:'import'};renderApp();return}
+        if(name==='choose-file'||name==='reupload'){var fileInput=document.getElementById('import-file');if(fileInput)fileInput.click();return}
+        if(name==='remove-upload'){state.formDraft.file='';renderApp();return}
+        if(name==='download-template'){downloadTemplate();return}
+        if(name==='confirm-import'){saveImport();return}
+        if(name==='column-settings'){state.formDraft={columns:(state.columns||initial.columns).slice()};state.modal={type:'columns'};renderApp();return}
+        if(name==='remove-column'){var col=el.getAttribute('data-col');state.formDraft.columns=(state.formDraft.columns||[]).filter(function(c){return c!==col});renderApp();return}
+        if(name==='reset-columns'){state.formDraft.columns=initial.columns.slice();renderApp();return}
+        if(name==='save-columns'){saveColumns();return}
+        if(name==='multilang'){openLanguage(el.getAttribute('data-field'));return}
+        if(name==='ai-translate'){var chinese=(state.formDraft&&state.formDraft[state.modal.field])||'';var dict={'基本工资':['Basic Salary','เงินเดือนพื้นฐาน','Lương cơ bản','Gaji Asas','الراتب الأساسي'],'固定津贴':['Fixed Allowance','เบี้ยเลี้ยงคงที่','Phụ cấp cố định','Elaun Tetap','بدل ثابت'],'交通津贴':['Transportation Allowance','ค่าเดินทาง','Phụ cấp đi lại','Elaun Pengangkutan','بدل النقل'],'泰国BNT总部薪资组方案':['Thailand BNT Headquarters Salary Group','กลุ่มเงินเดือนสำนักงานใหญ่ BNT ประเทศไทย','Nhóm lương trụ sở BNT Thái Lan','Kumpulan Gaji Ibu Pejabat BNT Thailand','مجموعة رواتب المقر الرئيسي BNT تايلاند'],'泰国BNT自然月':['Thailand BNT Calendar Month','เดือนปฏิทิน BNT ประเทศไทย','Tháng dương lịch BNT Thái Lan','Bulan Kalendar BNT Thailand','الشهر الميلادي لـ BNT تايلاند']};var vals=dict[chinese]||[chinese+' (EN)',chinese+' (TH)',chinese+' (VI)',chinese+' (MS)',chinese+' (AR)'];['en','th','vi','ms','ar'].forEach(function(k,i){state.formDraft.translations[k]=vals[i]});renderApp();setToast('示例译文已填入，可修改后保存');return}
+        if(name==='open-org'){state.orgField=el.getAttribute('data-field')||'orgs';state.orgOriginal=(state.formDraft[state.orgField]||[]).slice();state.modal={type:'org'};renderApp();return}
+        if(name==='remove-org'){var path=el.getAttribute('data-path')||'orgs';var ix=Number(el.getAttribute('data-index'));if(state.formDraft[path])state.formDraft[path].splice(ix,1);renderApp();return}
+        if(name==='remove-org-modal'){var val=el.getAttribute('data-org');addOrRemoveValue(state.orgField||'orgs',val,false);renderApp();return}
+        if(name==='confirm-org'){if(!(state.formDraft[state.orgField||'orgs']||[]).length){setToast(state.orgField==='scopeItems'?'至少选择一个薪资组':'至少选择一个组织',true);return}state.orgOriginal=null;state.modal=null;renderApp();return}
+        if(name==='save-language'){state.modal=null;renderApp();setToast('多语言内容已保存');return}
+        if(name==='save-drawer'){saveCurrentDrawer();return}
+        if(name==='save-correction'){saveCorrection();return}
+        if(name==='correct-record'){openCorrection(el.getAttribute('data-record'));return}
+        if(name==='delete-record'){openRecordDelete(el.getAttribute('data-emp'),el.getAttribute('data-record'));return}
+        if(name==='confirm-delete'){confirmDeleteRecord();return}
+        if(name==='select-record'){state.selectedRecord=el.getAttribute('data-record');renderApp();return}
+        if(name==='close-drawer'||name==='cancel-drawer'){closeDrawer();return}
+        if(name==='close-modal'||name==='cancel-modal'){closeModal();return}
+        if(name==='confirm-modal'){confirmAction();return}
+        if(name==='overlay-close'){if(evt&&evt.target===el){if(state.modal)closeModal();else closeDrawer()}return}
+      }
+      document.addEventListener('click',function(event){var el=event.target.closest('[data-action]');if(state.openFilter&&!event.target.closest('.filter-wrap')){state.openFilter='';var openChip=document.querySelector('.filter-chip.open');if(openChip){openChip.classList.remove('open');openChip.setAttribute('aria-expanded','false')}var openMenu=document.querySelector('.filter-menu:not(.select-menu)');if(openMenu)openMenu.remove()}if(state.openSelect&&!event.target.closest('.select-wrap')){state.openSelect='';document.querySelectorAll('.select-trigger.open').forEach(function(trigger){trigger.classList.remove('open');trigger.setAttribute('aria-expanded','false')});document.querySelectorAll('.select-menu').forEach(function(menu){menu.remove()})}if(!el)return;var action=el.getAttribute('data-action');doAction(action,el,event)},true);
+      function updateWeekEnd(path,value){var endPath=path==='salaryWeekStart'?'salaryWeekEnd':'attendanceWeekEnd';var endValue=addDateDays(value,6);if(state.formDraft)setPath(state.formDraft,endPath,endValue);var endInput=document.querySelector('[data-bind="'+endPath+'"]');if(endInput)endInput.value=endValue}
+      document.addEventListener('input',function(event){var el=event.target;if(el.matches('[data-search]')){state.filters[el.getAttribute('data-search')]=el.value;return}if(el.matches('[data-bind]')){var path=el.getAttribute('data-bind');if(state.formDraft)setPath(state.formDraft,path,el.value);if(path==='salaryWeekStart'||path==='attendanceWeekStart')updateWeekEnd(path,el.value);var languageRow=el.closest('.language-row'),languageDot=languageRow&&languageRow.querySelector('.language-dot');if(languageDot)languageDot.classList.toggle('empty',!el.value.trim());var count=document.querySelector('[data-count="'+CSS.escape(path)+'"]');if(count){var max=count.textContent.split('/')[1]||'';count.textContent=el.value.length+'/'+max}return}if(el.matches('[data-lang]')){if(!state.formDraft.translations)state.formDraft.translations={};state.formDraft.translations[el.getAttribute('data-lang')]=el.value;var row=el.closest('.language-row'),dot=row&&row.querySelector('.language-dot');if(dot)dot.classList.toggle('empty',!el.value.trim());return}if(el.matches('[data-amount]')){state.formDraft.amounts[el.getAttribute('data-amount')]=el.value;return}if(el.matches('[data-correct-amount]')){state.formDraft.amounts[el.getAttribute('data-correct-amount')]=el.value;return}if(el.matches('[data-bind="deleteNote"]')){state.formDraft.deleteNote=el.value}});
+      document.addEventListener('change',function(event){var el=event.target;if(el.matches('[data-bind]')){var path=el.getAttribute('data-bind');if(state.formDraft)setPath(state.formDraft,path,el.value);if(path==='salaryWeekStart'||path==='attendanceWeekStart')updateWeekEnd(path,el.value);if(['scope','cycle','attendance','type','scopeValue'].indexOf(path)>=0)renderApp();return}if(el.matches('[data-org]')){var value=el.getAttribute('data-org');addOrRemoveValue(state.orgField||'orgs',value,el.checked);renderApp();return}if(el.matches('[data-org-all]')){var nodes=Array.prototype.slice.call(document.querySelectorAll('[data-org]'));nodes.forEach(function(n){addOrRemoveValue(state.orgField||'orgs',n.getAttribute('data-org'),el.checked)});renderApp();return}if(el.matches('[data-column]')){var c=el.getAttribute('data-column');var arr=state.formDraft.columns||[];if(el.checked&&arr.indexOf(c)<0)arr.push(c);if(!el.checked)arr=arr.filter(function(x){return x!==c});state.formDraft.columns=arr;renderApp();return}if(el.matches('[data-column-all]')){var all=state.columnOptions.filter(function(c){return ['工号','姓名','基本工资'].indexOf(c)<0});state.formDraft.columns=el.checked?Array.from(new Set((state.formDraft.columns||[]).concat(all))):(state.formDraft.columns||[]).filter(function(c){return ['工号','姓名','基本工资'].indexOf(c)>=0});renderApp();return}if(el.matches('[data-import-item]')){var val=el.getAttribute('data-import-item');var arr=state.formDraft.importItems||[];if(el.checked&&arr.indexOf(val)<0)arr.push(val);if(!el.checked)arr=arr.filter(function(x){return x!==val});state.formDraft.importItems=arr;return}if(el.id==='import-file'&&el.files&&el.files.length){state.formDraft.file=el.files[0].name;renderApp();return}if(el.matches('[data-action="year-select"]')){state.year=Number(el.value);renderApp();return}});
+      document.addEventListener('keydown',function(event){if(event.key==='Escape'){if(state.openSelect){state.openSelect='';renderApp();return}if(state.openFilter){state.openFilter='';renderApp();return}if(state.modal)closeModal();else if(state.drawer)closeDrawer()}if(event.key==='Enter'&&event.target.matches('[data-search]')){event.preventDefault();state.openFilter='';state.openSelect='';renderApp()}});
+      document.addEventListener('dragstart',function(event){var row=event.target.closest('[data-col-index]');if(row){event.dataTransfer.setData('text/plain',row.getAttribute('data-col-index'));event.dataTransfer.effectAllowed='move'}});
+      document.addEventListener('dragover',function(event){if(event.target.closest('[data-col-index]'))event.preventDefault()});
+      document.addEventListener('drop',function(event){var target=event.target.closest('[data-col-index]');if(!target)return;event.preventDefault();var from=Number(event.dataTransfer.getData('text/plain'));var to=Number(target.getAttribute('data-col-index'));var arr=state.formDraft&&state.formDraft.columns;if(!arr||from===to)return;var moved=arr.splice(from,1)[0];arr.splice(to,0,moved);state.formDraft.columns=arr;renderApp()});
+      document.addEventListener('dragover',function(event){if(event.target.closest('.upload-drop'))event.preventDefault()});
+      document.addEventListener('drop',function(event){var zone=event.target.closest('.upload-drop');if(!zone)return;event.preventDefault();var files=event.dataTransfer.files;if(files&&files.length){state.formDraft.file=files[0].name;renderApp()}});
+      renderApp();
+    })();
+  </script>
+</body>
+</html>
+
