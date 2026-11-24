@@ -599,12 +599,12 @@
         {id:'sg5',name:'实发工资',translations:{en:'Net Salary'},expanded:false,items:[]}
       ];
       var defaultPeriods=[
-        {id:'p1',name:'泰国-代理区A(16-31)自然月',scope:'全部组织',cycle:'月薪',first:'2026-11-09',status:'启用',desc:'泰国BNT自然月',creator:'孙楚一'},
-        {id:'p2',name:'泰国BNT自然月',scope:'J&T集团-集团总部-产研...',cycle:'月薪',first:'2026-10-31',status:'启用',desc:'泰国BNT自然月',creator:'李响'},
-        {id:'p3',name:'泰国-代理区A(1-15)半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-27',status:'启用',desc:'泰国BNT自然月',creator:'周翠娥'},
-        {id:'p4',name:'泰国-代理区A(16-31)半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-27',status:'停用',desc:'泰国BNT自然月',creator:'周晟'},
-        {id:'p5',name:'泰国工厂区半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-18',status:'停用',desc:'泰国BNT自然月',creator:'王嘉琪'},
-        {id:'p6',name:'泰国-代理区A(1-15)半月薪',scope:'J&T集团-集团总部-产研...',cycle:'半月薪',first:'2026-10-17',status:'停用',desc:'泰国BNT自然月',creator:'冯雪梅'},
+        {id:'p1',name:'泰国-代理区A(16-31)周薪',scope:'全部组织',cycle:'周薪',first:'2026-11-09',status:'启用',desc:'泰国BNT自然月',creator:'孙楚一'},
+        {id:'p2',name:'泰国BNT周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'2026-10-31',status:'启用',desc:'泰国BNT自然月',creator:'李响'},
+        {id:'p3',name:'泰国-代理区A(1-15)周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'2026-10-27',status:'启用',desc:'泰国BNT自然月',creator:'周翠娥'},
+        {id:'p4',name:'泰国-代理区A(16-31)周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'2026-10-27',status:'停用',desc:'泰国BNT自然月',creator:'周晟'},
+        {id:'p5',name:'泰国工厂区周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'2026-10-18',status:'停用',desc:'泰国BNT自然月',creator:'王嘉琪'},
+        {id:'p6',name:'泰国-代理区A(1-15)周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'2026-10-17',status:'停用',desc:'泰国BNT自然月',creator:'冯雪梅'},
         {id:'p7',name:'越南-快递员周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'启用',desc:'周薪考勤周期一致',creator:'冯新玲'},
         {id:'p8',name:'泰国-快递员周薪',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'停用',desc:'泰国BNT自然月',creator:'周瀛'},
         {id:'p9',name:'越南-快递员周薪2',scope:'J&T集团-集团总部-产研...',cycle:'周薪',first:'',status:'停用',desc:'泰国BNT自然月',creator:'周翠娥'},
@@ -633,7 +633,8 @@
         periods:[['适用组织',['全部','全部组织','自定义']],['状态'],['描述',['全部']],['创建人',['全部']],['创建时间',['全部']],['更新人',['全部']],['更新时间',['全部']],['发薪周期',['全部','月薪','半月薪','周薪'],false]],
         archives:[['工号/姓名',['全部','工号','姓名']],['部门',['全部','运营部-曼谷分拨']],['岗位',['全部','运营专员']],['薪资组',['全部','TH-BKK','TH-BNT']],['人员范围',['全部','在职','离职']],['主兼职',['全部','主岗','兼岗']],['生效日期',['全部','近30天']],['创建人',['全部']],['创建时间',['全部']],['更新人',['全部']],['更新时间',['全部']]]
       };
-      function loadState(){try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw)return initial;var saved=JSON.parse(raw);return Object.assign({},initial,saved)}catch(e){return initial}}
+      function migrateWeeklyPeriods(periods){var oldNames={'p1':'泰国-代理区A(16-31)自然月','p2':'泰国BNT自然月','p3':'泰国-代理区A(1-15)半月薪','p4':'泰国-代理区A(16-31)半月薪','p5':'泰国工厂区半月薪','p6':'泰国-代理区A(1-15)半月薪'},weeklyNames={'p1':'泰国-代理区A(16-31)周薪','p2':'泰国BNT周薪','p3':'泰国-代理区A(1-15)周薪','p4':'泰国-代理区A(16-31)周薪','p5':'泰国工厂区周薪','p6':'泰国-代理区A(1-15)周薪'};return (periods||[]).map(function(period){if(oldNames[period.id]===period.name)return Object.assign({},period,{name:weeklyNames[period.id],cycle:'周薪'});return period})}
+      function loadState(){try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw)return initial;var saved=JSON.parse(raw),loaded=Object.assign({},initial,saved);loaded.periods=migrateWeeklyPeriods(loaded.periods);return loaded}catch(e){return initial}}
       function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({page:state.page,groups:state.groups,items:state.items,subjectGroups:state.subjectGroups,periods:state.periods,employees:state.employees,archive:state.archive,columns:state.columns,archiveView:state.archiveView,filterVisibility:state.filterVisibility}))}catch(e){}}
       function esc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
       function uid(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6)}
