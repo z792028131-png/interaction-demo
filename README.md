@@ -4,6 +4,7 @@
 
 - [OA新建页面 · 移动端高保真 Demo](https://z792028131-png.github.io/interaction-demo/oa-new-page/)
 - [春节福利卡片 · 入场动效及领取交互](https://z792028131-png.github.io/interaction-demo/spring-festival-card-entry/)
+- [薪酬系统 · 桌面端交互演示](https://z792028131-png.github.io/interaction-demo/payroll-system/)
 - [打开交互原型库首页](https://z792028131-png.github.io/interaction-demo/)
 
 下面是春节福利卡片演示的固定参数和交付说明。
