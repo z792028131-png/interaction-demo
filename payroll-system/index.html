@@ -697,6 +697,7 @@
       function isoWeekNumber(date){var d=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()));d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));var yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-yearStart)/86400000)+1)/7)}
       function isoWeeksInYear(year){return isoWeekNumber(new Date(Date.UTC(year,11,28)))}
       function isoWeekRange(year,week){var jan4=new Date(Date.UTC(year,0,4));var monday=new Date(jan4);monday.setUTCDate(jan4.getUTCDate()-((jan4.getUTCDay()+6)%7)+(week-1)*7);var sunday=new Date(monday);sunday.setUTCDate(monday.getUTCDate()+6);function fmt(d){return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0')}return fmt(monday)+' 至 '+fmt(sunday)}
+      function weeklyPeriodName(startDate){var parts=String(startDate||'').split('-').map(Number);if(parts.length!==3||!parts[0]||!parts[1]||!parts[2])return '';return String(parts[0])+String(parts[1]).padStart(2,'0')+'W'+Math.ceil(parts[2]/7)}
       function renderWeeklyDetail(){
         var p=state.periods.find(function(x){return x.id===state.selectedPeriod})||state.periods.filter(function(x){return x.cycle==='周薪'})[0]||initial.periods[6];
         var year=Number(state.year)||2026;
@@ -707,7 +708,7 @@
           var rowYear=year;
           if(week<1){rowYear--;week=isoWeeksInYear(rowYear)+week}
           var range=isoWeekRange(rowYear,week);
-          weekRows.push('<tr><td>'+rowYear+'年 第'+week+'周</td><td>'+range+'</td><td>'+range+'</td></tr>');
+          weekRows.push('<tr><td>'+weeklyPeriodName(range.split(' 至 ')[0])+'</td><td>'+range+'</td><td>'+range+'</td></tr>');
         }
         var yearOptions=[2026,2025,2024].map(function(y){return {value:String(y),label:y+'年'}});
         var cycle=p.cycle==='周薪'?'周':(p.cycle||'周');
